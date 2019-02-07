@@ -99,8 +99,8 @@ foreach my $chem (@chemosensory){
 	# Parsing tblastn output
 	print "Parsing $chem tblastn\n";
 
-	system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
-	system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
+	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
+	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
 	system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff_genomic_positions.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
 	system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
 
@@ -403,7 +403,7 @@ foreach my $chem (@chemosensory){
 
 	## Generating a GFF for genomic genes
 
-	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it shoyuld be produced alse later after manually filtering
+	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
 	system ("perl $dirname/get_genomic_gff_filtered_cut.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3

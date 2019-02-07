@@ -92,7 +92,7 @@ foreach my $gene (@genomegenes){
 				}				
 
 
-			} else {die "ERROR in get_genomic_gff.pl: It does not exist the genomic gene $gene\n";}
+			} else {die "ERROR in get_genomic_gff.pl: It does not exist the genomic gene exon $gen from $gene\n";}
 		}
 
 		print Results "$scaf\tGenomicGFF\tgene\t$ini\t$fin\t.\t$chain\t.\tID=$gene;\n";

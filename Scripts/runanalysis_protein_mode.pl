@@ -6,7 +6,7 @@ my $dirname = dirname(__FILE__);
 #########################################################
 #####
 #
-# Run first analysis, using blastp and hmmer
+# Run first analysis, using blastp and hmmer without a GFF file
 #
 #####
 
@@ -15,10 +15,8 @@ my $dirname = dirname(__FILE__);
 my $name = $ARGV[0];
 my $transcripts = $ARGV[1];
 my $chemdir = $ARGV[2];
-my $gff = $ARGV[3];
-my $genome = $ARGV[4];
-my $evalue = $ARGV[5];
-my $threads = $ARGV[6];
+my $evalue = $ARGV[3];
+my $threads = $ARGV[4];
 
 ## Start
 
@@ -95,16 +93,7 @@ foreach my $chem (@chemosensory){
 	# Obtaining raw original and cut protein sequences
 
 	system ("perl $dirname/get_fasta_fromalist_v2.pl $transcripts $chem/$chem\_combinedsearches_list.txt $chem/$chem"); 
-	system ("perl $dirname/get_fasta_cut.pl $chem/$chem\_combinedsearches_list.txt $chem/$chem\_proteins.fasta $chem/$chem"); 
-
-	# Generating a GFF3 for the identified and reannotated (cut) proteins
-
-	system ("perl $dirname/get_annot_genes_gff_v2.pl $gff $genome $chem/$chem\_combinedsearches_list.txt $chem/$chem");
-
-	# Validating the obtained GFF3
-
-	system ("blastp -query $chem/$chem\_proteins_cut.fasta -subject $chem/$chem"."gffcut.pep.fasta -out $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_proteins_cut.fasta $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 $chem\/$chem");
+	system ("perl $dirname/get_fasta_cut.pl $chem/$chem\_combinedsearches_list.txt $chem/$chem\_proteins.fasta $chem/$chem");
 
 
 	# Counting numbers

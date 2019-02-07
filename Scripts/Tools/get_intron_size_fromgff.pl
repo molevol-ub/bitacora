@@ -18,6 +18,7 @@ my $totalintrons = 0;
 my $totalintronsize = 0;
 my $longerintrons = 0;
 my $maxintron = "0";
+my $minintron = "99999999999999999999999999999999";
 my @intronslength;
 
 my $input=$ARGV[0];
@@ -38,6 +39,9 @@ while(defined($eachline=<IN>)){
 					push(@intronslength, $each_intron_size);
 					if ($each_intron_size > $maxintron){
 						$maxintron = $each_intron_size;
+					}
+					if ($each_intron_size < $minintron){
+						$minintron = $each_intron_size;
 					}
 					if ($each_intron_size > $maxintronlength){
 						$longerintrons++;
@@ -68,6 +72,9 @@ if(scalar(@exons)>2){
 		if ($each_intron_size > $maxintron){
 			$maxintron = $each_intron_size;
 		}
+		if ($each_intron_size < $minintron){
+			$minintron = $each_intron_size;
+		}		
 		if ($each_intron_size > $maxintronlength){
 			$longerintrons++;
 		}
@@ -78,7 +85,7 @@ if(scalar(@exons)>2){
 my $avelength = sprintf("%.4f", $totalintronsize/$totalintrons);
 my $longerperc =  sprintf("%.4f", (($longerintrons/$totalintrons) * 100));
 my $medianlength = median(@intronslength);
-print "Totalintrons: $totalintrons\nAverageIntronLength: $avelength\nMedianIntronLength: $medianlength\nMaxIntronLength: $maxintron\nIntronLongerThan$maxintronlength"."bp: $longerintrons\n";
+print "Totalintrons: $totalintrons\nAverageIntronLength: $avelength\nMedianIntronLength: $medianlength\nMaxIntronLength: $maxintron\nMinIntronLength: $minintron\nIntronLongerThan$maxintronlength"."bp: $longerintrons\n";
 print "PercentLongerIntrons:$longerperc%\n";
 
 sub median

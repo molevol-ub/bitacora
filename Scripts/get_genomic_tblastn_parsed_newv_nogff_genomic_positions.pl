@@ -6,6 +6,7 @@ use warnings;
 
 my ($line, $name, $nameout);
 my (%blast, %fasta, %hits);
+my %scaflength;
 
 my $evalue = $ARGV[2];
 
@@ -20,6 +21,7 @@ while (<Blastfile>) {
 	next if ($subline[10] > $evalue); # Filtro por evalue
 	my $frame = "";
 
+	$scaflength{$subline[1]} = $subline[14];
 
 	my $key = $subline[1];
 	my $ini = "";
@@ -298,6 +300,7 @@ foreach my $key (sort keys %hits_parsed) {
 
 open (Results, ">", "$ARGV[1]tblastn_parsed_list_genomic_positions_nogff_filtered.txt");
 open (Results2, ">", "$ARGV[1]tblastn_parsed_list_genomic_positions_nogff_filtered.bed");
+open (Results3, ">", "$ARGV[1]tblastn_parsed_list_nogff_filtered.txt");
 foreach my $key (sort keys %hits_parsed_2nd) {
 	my $i = 0;
 	foreach my $hit (@{$hits_parsed_2nd{$key}}){
@@ -305,18 +308,24 @@ foreach my $key (sort keys %hits_parsed_2nd) {
 		my @subhit = split (/\t/, $hit);
 		print Results "$key\_exon$i Frame$subhit[0] complete $subhit[1] $subhit[2] tblastn\n";
 		print Results2 "$key\t$subhit[1]\t$subhit[2]\tFrame$subhit[0]\n";
+
+		my $ini = "";
+		my $end = "";
+		my $frame = $subhit[0];
+		if ($frame == 1 || $frame == 2 || $frame == 3){
+			$ini = int($subhit[1]/3);
+			$end = int($subhit[2]/3);
+		} else {
+			$ini = int(($scaflength{$key} - $subhit[2])/3);
+			$end = int(($scaflength{$key} - $subhit[1])/3);
+		}
+
+		print Results3 "$key\_exon$i Frame$subhit[0] complete $ini $end tblastn\n";
 	}
 }
 close Results;
 close Results2;
-=h
-open (Results, ">", "$ARGV[1]tblastn_genescatched_list.txt");
-my $totalgenescatched = scalar (keys %countsgenescatched);
-print Results "Totalgenescatched $totalgenescatched\n";
-foreach my $key (sort keys %countsgenescatched) {
-	print Results "$key $countsgenescatched{$key}\n";
-}
-close Results;
+close Results3;
 
 
 

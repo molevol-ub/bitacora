@@ -2,14 +2,14 @@
 use strict;
 use warnings;
 
-# usage: perl get_tblastn_parsed_newv_nogff.pl outfmt6_file nombre_out evalue
+# usage: perl get_tblastn_parsed_newv_nogff.pl outfmt6_file outname evalue
 
 my ($line, $name, $nameout);
 my (%blast, %fasta, %hits);
 
 my $evalue = $ARGV[2];
 
-#Abriendo resultados Blast
+# Opening blast output
 
 open (Blastfile , "<", $ARGV[0]); 
 while (<Blastfile>) {

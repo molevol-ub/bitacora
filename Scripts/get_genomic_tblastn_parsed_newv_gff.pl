@@ -346,7 +346,7 @@ foreach my $key (sort keys %hits_parsed_2nd) {
 	}
 }
 close Results;
-
+=h
 open (Results, ">", "$ARGV[1]tblastn_genescatched_list.txt");
 my $totalgenescatched = scalar (keys %countsgenescatched);
 print Results "Totalgenescatched $totalgenescatched\n";
@@ -354,6 +354,6 @@ foreach my $key (sort keys %countsgenescatched) {
 	print Results "$key $countsgenescatched{$key}\n";
 }
 close Results;
-
+=cut
 
 
