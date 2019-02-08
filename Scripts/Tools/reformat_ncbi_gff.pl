@@ -56,11 +56,11 @@ while (<GFFfile>) {
 		} else {die "ERROR in reformat_ncbi_gff.pl: No frame in CDS in: $line\n";}
 
 		## Protein ID from NCBI
-		my $proteinid = "";
+		my $proteinid = "none";
 		if ($subline[8] =~ /rotein_id=([^;]+)/){
 			$proteinid = $1;
 		}
-		else {die "ERROR in reformat_ncbi_gff.pl: It does not find ProteinID in the GFF3 in: $line\nAre you sure the GFF is from NCBI?\nExpected format is as:\nNW_018367575.1  Gnomon  CDS     3420    3965    .       -       0       ID=cds0;Parent=rna0;Dbxref=GeneID:107443680,Genbank:XP_015913113.1;Name=XP_015913113.1;gbkey=CDS;gene=LOC107443680;product=protein maternal effect lethal 26-like;protein_id=XP_015913113.1\n";}
+		else {print "WARNING in reformat_ncbi_gff.pl: It does not find ProteinID (protein_id=) in the GFF3 in: $line\nAre you sure the GFF is from NCBI?\nExpected format is as:\nNW_018367575.1  Gnomon  CDS     3420    3965    .       -       0       ID=cds0;Parent=rna0;Dbxref=GeneID:107443680,Genbank:XP_015913113.1;Name=XP_015913113.1;gbkey=CDS;gene=LOC107443680;product=protein maternal effect lethal 26-like;protein_id=XP_015913113.1\nStepping this protein...\n";}
 
 		$protid{$genename}=$proteinid;
 
@@ -133,6 +133,7 @@ foreach my $gene (@genes){
 		my $geneid = "";
 		if (exists $protid{$gene}){
 			$geneid = $protid{$gene};
+			next if ($geneid =~ /none/);
 		} else {die "ERROR in reformat_ncbi_gff.pl: a protein ID cannot be found for gene $gene\n";}
 
 		if ($keep =~ /$geneid  /){
