@@ -44,7 +44,7 @@ QUERYDIR=/path/to/query_folder
 ##         		    EDITABLE PARAMETERS					##
 ##########################################################
 
-# Set CLEAN=T if you wish to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the output folder
+# Set CLEAN=T if you want to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the output folder
 CLEAN=T
 
 # You can modify the E-value used to filter BLAST and HMMER. Default is 1e-5

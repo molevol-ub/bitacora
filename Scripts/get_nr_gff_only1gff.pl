@@ -43,7 +43,7 @@ while (<Fasta>) {
 				$geneparent = $1;
 			} else {
 			#	die "No encuentro gene parent en $gene en $line\n";
-				$geneparent = $gene;
+				$geneparent = "gene_$gene";
 			}
 		}
 

@@ -152,7 +152,7 @@ foreach my $gene (@genes){
 		print Results "$subl[0]\t$subl[1]\tgene\t$subl[3]\t$subl[4]\t$subl[5]\t$subl[6]\t$subl[7]\tID=$geneid;$rest\n";
 		print Results "$subl[0]\t$subl[1]\tmRNA\t$subl[3]\t$subl[4]\t$subl[5]\t$subl[6]\t$subl[7]\tID=$geneid;Parent=$parentid;$rest\n";
 
-		my @positions = keys ($gffcds{$gene});
+		my @positions = keys (%{$gffcds{$gene}});
 		my @posorder;
 		my $n = 1;
 

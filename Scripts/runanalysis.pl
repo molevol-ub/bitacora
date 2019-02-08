@@ -103,7 +103,7 @@ foreach my $chem (@chemosensory){
 
 	# Validating the obtained GFF3
 
-	system ("blastp -query $chem/$chem\_proteins_cut.fasta -subject $chem/$chem"."gffcut.pep.fasta -out $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std qlen slen\"");
+	system ("blastp -query $chem/$chem\_proteins_cut.fasta -subject $chem/$chem"."gffcut.pep.fasta -out $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
 	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_proteins_cut.fasta $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 $chem\/$chem");
 
 

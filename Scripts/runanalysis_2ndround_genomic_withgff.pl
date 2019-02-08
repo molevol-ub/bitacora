@@ -207,7 +207,7 @@ foreach my $chem (@chemosensory){
 	# Removing putative new sequences already annotated (i.e. duplicated regions due to assembly artifacts)
 
 	#print "Doing $chem blast genomic vs anotated $chem\n";
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem\_proteins\_cut.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -num_threads $threads -out $chem/$chem\_genomicVsanotated.outfmt6");
+	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem\_proteins\_cut.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
 
 	open (File, "<", "$chem/$chem\_proteins\_cut.fasta");
 	my %fasta_annot;
@@ -408,7 +408,7 @@ foreach my $chem (@chemosensory){
 
 	# Validating the obtained GFF3
 
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem"."gffgenomiccut.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std qlen slen\"");
+	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem"."gffgenomiccut.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
 	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 

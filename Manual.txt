@@ -15,7 +15,7 @@ Contents
 ###
 
 - Installation
-- Prerquisites
+- Prerequisites
 - Requirements
 - Usage
 	- Basic mode

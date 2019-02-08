@@ -88,7 +88,7 @@ while (<File>) {
 
 	$gene = $subline[0];
 
-	$geneparent = $gene;
+	$geneparent = "gene_$gene";
 
 
 	if (exists $gffgene{$gene}){
@@ -150,7 +150,7 @@ while (<File>) {
 
 	$gene = $subline[0];
 
-	$geneparent = $gene;
+	$geneparent = "gene_$gene";
 
 
 	my $printcds;

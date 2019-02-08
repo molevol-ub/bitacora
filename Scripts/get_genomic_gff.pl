@@ -95,8 +95,10 @@ foreach my $gene (@genomegenes){
 			} else {die "ERROR in get_genomic_gff.pl: It does not exist the genomic gene exon $gen from $gene\n";}
 		}
 
-		print Results "$scaf\tGenomicGFF\tgene\t$ini\t$fin\t.\t$chain\t.\tID=$gene;\n";
-		print Results "$scaf\tGenomicGFF\tmRNA\t$ini\t$fin\t.\t$chain\t.\tID=$gene;Parent=$gene;\n";
+		my $geneparent = "gene_$gene";
+
+		print Results "$scaf\tGenomicGFF\tgene\t$ini\t$fin\t.\t$chain\t.\tID=$geneparent;\n";
+		print Results "$scaf\tGenomicGFF\tmRNA\t$ini\t$fin\t.\t$chain\t.\tID=$gene;Parent=$geneparent;\n";
 		foreach my $cds (@cdsline){
 			my @cdssplit = split(/\t/, $cds);
 			print Results "$cdssplit[0]\t$cdssplit[1]\t$cdssplit[2]\t$cdssplit[3]\t$cdssplit[4]\t$cdssplit[5]\t$cdssplit[6]\t$cdssplit[7]\t$cdssplit[8]\n";
