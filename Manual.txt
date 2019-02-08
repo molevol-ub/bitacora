@@ -1,0 +1,267 @@
+##########################################################
+##                                                      ##
+## PAIP: Protein annotation and identification pipeline ##
+##                                                      ##
+## Developed by Joel Vizueta                            ##
+## Contact: via github or jvizueta@ub.edu               ##
+##                                                      ##
+##########################################################
+
+
+Abstract - Under construction
+
+###
+Contents
+###
+
+- Installation
+- Prerquisites
+- Requirements
+- Usage
+	- Basic mode
+	- Protein only mode
+	- Genome only mode
+- Parameters
+- Running
+- Output
+- Example
+- Citation
+
+
+####
+Installation
+####
+
+PAIP is based in perl scripts and it does not require any installation. Just download all contents from github.
+To run the program, execute the master script runPAIP.sh before editing all required variables: Prerequisites, Data, and Parameters.  
+
+####
+Prerequisites
+####
+
+PAIP depends on:
+
+- BLAST: Download blast executables from ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
+
+- HMMER: Easiest way to install depending on your system:
+
+  % brew install hmmer               # OS/X, HomeBrew
+  % port install hmmer               # OS/X, MacPorts
+  % apt install hmmer                # Linux (Ubuntu, Debian...)
+  % dnf install hmmer                # Linux (Fedora)
+  % yum install hmmer                # Linux (older Fedora)
+  % conda install -c bioconda hmmer  # Anaconda
+
+Or compile from source code downloadable from: http://hmmer.org/
+
+- Perl: Typically installed with most of systems: https://learn.perl.org/installing/
+
+HMMER and BLAST require to be added in PATH variable. Edit path to bin folders in the master script runPAIP.sh
+i.e.:$ export PATH=$PATH:/path/to/blast/bin
+
+###
+Requirements
+###
+
+PAIP have been tested and can be used in UNIX systems (both Mac OS and Linux). It allows using multiple threads in blast searches, the most time-consuming step by editing the option THREADS in runPAIP.sh 
+
+For a standard good quality genome (~2Gb estimated size, 12,000 scaffols) the pipeline can be computed in any modern computer (16Gb RAM) in a couple of hours, depending on the number of genes and the gene family size used as query.
+However, if your genome is bigger and/or very fragmented, you should use a computer cluster or workstation with more RAM capacity.
+
+####
+Usage
+####
+
+PAIP has been designed to be used both with genome sequences and protein annotations. Nonetheless, it also allows two additional modes to use only protein or genomic sequences, see below for more details. 
+
+Preparing the data: The following data files are required by PAIP and have to be included in the master script runPAIP.sh
+
+
+1. Input genomic sequences in fasta format
+
+
+2. GFF3 file
+
+Mandatory fields in GFF3 are mRNA or transcript, and CDS. 
+
+--------------------- GFF3 example
+lg1_ord1_scaf1770       AUGUSTUS        gene    13591   13902   0.57    +       .       ID=g1;
+lg1_ord1_scaf1770       AUGUSTUS        mRNA    13591   13902   0.57    +       .       ID=g1.t1;Parent=g1;
+lg1_ord1_scaf1770       AUGUSTUS        start_codon     13591   13593   .       +       0       Parent=g1.t1;
+lg1_ord1_scaf1770       AUGUSTUS        CDS     13591   13902   0.57    +       0       ID=g1.t1.CDS1;Parent=g1.t1
+lg1_ord1_scaf1770       AUGUSTUS        exon    13591   13902   .       +       .       ID=g1.t1.exon1;Parent=g1.t1;
+lg1_ord1_scaf1770       AUGUSTUS        stop_codon      13900   13902   .       +       0       Parent=g1.t1;
+---------------------
+
+PAIP also accepts other GFF formats as Ensembl GFF3 or GTF. If your GFF causes error in PAIP, see Troubleshooting.
+
+--------------------- Ensembl GFF3 example
+AFFK01002511    EnsemblGenomes  gene    761     1018    .       -       .       ID=gene:SMAR013822;assembly_name=Smar1;b
+iotype=protein_coding;logic_name=ensemblgenomes;version=1
+AFFK01002511    EnsemblGenomes  transcript      761     1018    .       -       .       ID=transcript:SMAR013822-RA;Pare
+nt=gene:SMAR013822;assembly_name=Smar1;biotype=protein_coding;logic_name=ensemblgenomes;version=1
+AFFK01002511    EnsemblGenomes  CDS     761     811     .       -       0       Parent=transcript:SMAR013822-RA;assembly_name=Smar1
+AFFK01002511    EnsemblGenomes  exon    761     811     .       -       .       Parent=transcript:SMAR013822-RA;Name=SMAR013822-RA-E2;assembly_name=Smar1;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;rank=2;version=1
+---------------------
+
+If your GFF is formatted from NCBI a causes Error in checking the data step, you can use the Script reformat_ncbi_gff.pl located in Scrips/Tools to reformat the GFF and be parseable by PAIP.
+
+
+3. Input protein sequence fasta file
+
+PAIP expects that protein ids are named as mRNA or transcript IDs in the GFF3.
+
+
+4. Query Database folder
+
+(Orden: 1 decir que se necesita fasta y hmmer
+2 detallar como se pueden obtener
+3 construir su propio HMM)
+
+Here, you have to include a fasta file containing all sequences to search in the organism of interest. If searching for different unrelated proteins or different gene families, a different file should be created for each one and PAIP will read all query files and search them independently (see Example/DB for an example to be used two different gene families in PAIP: OR, Odorant Receptors; and OBPs, Odorant Binding Proteins).
+
+In addition, a Hiden Markov Model (HMM) for each set of genes/gene families have to be included. The HMM profile should cover most of the query protein, so we do not reccomen using domains that cover just a part of the protein. 
+
+Both fasta and HMM files need to be renamed as QUERYID_db.fasta and QUERYID_db.hmm, respectively.
+
+
+About HMM profiles:
+HMM profiles can be found in InterPro or PFAM databases associated to known protein domains. If you don't know if your protein contains any described domain, you can do a search in InterPro (http://www.ebi.ac.uk/interpro/) using the protein sequence of one of your querys to identify domains.
+For example, for the chemsensory proteins (CSPs) in insects, you can download the HMM profile from pfam (Curation & model):
+http://pfam.xfam.org/family/PF03392#tabview=tab6
+
+In the case of searching for proteins with not described protein domains, or with domains not covering most of the protein sequence, it should be performed an alignment of the query proteins to construct a specific HMM profile. 
+
+Example of constructing a protein profile (it requires an aligner, here we use mafft as example):
+$ mafft --auto QUERY_db.fasta > QUERY_db.aln
+$ hmmbuild QUERY_db.hmm QUERY_db.aln
+
+
+About the importance of selecting a confidence database:
+The proteins included in the database to be used as query in the protein search is really important, as the inclusion of unrelated or bad annotated proteins could lead to the identification and annotation of proteins unrelated to the searched gene family and can inflate the number of sequences identified.
+On the other hand, if possible, we reccomend to include proteins from sister species to increase the power of identifying more proteins, particularly in fast-evolving and divergent gene families. If your organism of interest does not have any sister or related species annotated genomes to use their sequences as query, we suggest to perform a second round in PAIP, including in the query database the sequences identified in the first round and constructing with those a new HMM profile to putatively identify more divergent sequences.
+
+
+Different PAIP modes:
+
+A. PAIP protein mode: In case of having only protein sequences (i.e. coding sequences from transcriptomic data), you can run the pipeline by using the master script runPAIP_protein_mode.sh and including the protein file and a query directory, as described above in 3 and 4.
+
+Here, PAIP will only indentify and curate the query sequences in the protein dataset, obtaining a set of proteins. Original annotated sequences could be found in Intermediate_Files if cleaning output is active.
+
+
+B. PAIP genome mode: PAIP can also be ran with a not annotated genome, although it is not the ideal situation and the power of protein detection decreases as proteins are fragmented in different exons. You should use the master script runPAIP_genome_mode.sh and includei the genome fasta file and a query directory, as described above in 1 and 4.
+
+PAIP will output a bed file of coordinates from putative exons detected in the genome, in addition to a fasta and a GFF3 file of annotated proteins. Take into account that this mode requires a manual revision of the obtained proteins, and it is designed to help the annotation in genomic annotation editors, as Apollo.
+
+
+###
+Parameters: 
+###
+
+
+- BLAST and HMMER are filtered with an e-value of 10e-5, in addition to an internal parameter of length covered by the alignment.
+E-value can be edited in the master script runPAIP.sh:
+EVALUE=10e-5 
+
+- It is used a value of 16Kb to join putative exons from independent but contiguous genome hits. 
+This value can be modified in the master script pipeline_gene_finding.sh:
+MAXINTRON=160000
+
+About this parameter:
+Note that a very high value will probably join exons of different genes into one producing chimeric genes. On the other hand, a very low value could not join exons from the same gene.
+As default, we use a conservative high value to be sure that all exons from a gene were joined, although we also obtained gene fusions, which we separate afterwards. These gene fusions are tagged with Xdom (as putative domains) at the end of the protein name in the output file, meaning that more than one domain is found in the protein, pointing to X independent proteins. 
+
+You can use the script Scripts/Tools/get_intron_size_fromgff.pl with your GFF file to estimate intron length statistics and use a more realistic value in this parameter for your genome. 
+
+After running PAIP, you can identify new proteins identified in not annotated regions of the genome that can be more than one putative protein (labeled with Xdom) with the wollowing command:
+$ grep '>.*dom' DB/DB_genomic_and_annotated_proteins_cut.fasta
+
+
+###
+Running
+### 
+
+You just need to execute the following command in a folder containing the master script, after modifying all required variables.
+$ bash runPAIP.sh
+
+
+####
+Output
+####
+
+PAIP will create an output folder for each query database, and three files with the number of proteins identified in each step, and a summary table.
+In each folder, you will find the following main files (you will only see these files if chose to clean output directory): 
+
+- X_genomic_and_annotated_genes_cut.gff3: GFF3 containing all identified protein curated models both in already annotated proteins and unannotated genomic sequences.
+- X_genomic_and_annotated_proteins_cut.fasta: A fasta file containing the protein sequences from the above gene models.
+
+Non-redundant files: Proteins from above identical in sequence are removed, considered as artefactual false positive proteins.
+- X_genomic_and_annotated_genes_cut_nr.gff3: GFF3 containing all identified non-redundant protein curated models both in already annotated proteins and unannotated genomic sequences.
+- X_genomic_and_annotated_proteins_cut.fasta: A fasta file containing the non-redundant protein sequences from the above gene models.
+
+Bed files with non-redundant extended blast hits in genome sequence:
+- Xtblastn_parsed_list_genomic_positions.bed: BED file with only blast alignment in non annotated regions
+- Xtblastn_parsed_list_genomic_positions_nogff_filtered.bed: BED file with blast alignment in all genomic regions
+
+
+In addition to these files, PAIP generates the following Intermediate files:
+
+	- X_annot_genes.gff3: GFF3 containing the original models for the identified proteins
+	- X_annot_genes_cut.gff3: GFF3 containing a curated model for the identified annotated proteins (cut exons if not aligned to query db sequences or split putative fused genes)
+	- X_genomic_genes.gff3: GFF3 containing new identified proteins in genomic sequences. 
+	- X_genomic_genes_cut.gff3: GFF3 containing new identified proteins in genomic sequences curated by the positions identified in the HMM profile.
+	- Xgffcut*fasta: Files containing CDS and protein sequences translated directly from X_annot_genes_cut.gff3
+	- Xgffgenomiccut*fasta: Files containing CDS and protein sequences translated directly from X_genomic_genes_cut.gff3
+
+	- hmmer folder containing the output of HMMER searches against the annotated proteinas a new proteins identified in the genome
+	- X_blastp.outfmt6: BLASTp output of the search of the query DB against the annotated peptides
+	- X_tblastn.outfmt6: tBLASTn output of the search of the query query DB against the genomic sequence
+	- X_blastp_parsed_list.txt; X_hmmer_parsed_list.txt; X_allsearches_list.txt; X_combinedsearches_list.txt: Parsed files combining all hits and extending the hitted positions from blastp and hmmer outputs
+	- X_tblastn_parsed_list_genomic_positions.txt (and _notgff_filtered): File containing the positions identified after parsing the tBLASTn search. 
+	- X_prots_VsGFF_badannot_list.txt and _goodannot_list.txt: Debugging files: These files are for checking that the identified proteins and the protein models in the GFF3 codify the same protein. If the file badannot_list.txt contains any identifier, that means that the GFF3 annotation is incorrect pointing to a bad annotation in the original GFF3. Please, try to translate the CDS for that protein into the 3 reading frames and check if the 2nd or 3rd frame codify for the protein in question stored in "X_genomic_and_annotated_proteins_cut_nr.fasta". If correct, modify the GFF3 by adding 1 or 2 nucleotide position in the start of the GFF3 (take into account if it is transcribed from forward or reverse strand). If negative, please report the error via github as described in troubleshooting.
+	- X_genomic_genes_proteins.fasta: contains all merged exons from putative new proteins identified in the genome before filtering those without the protein domain identified with HMMER. This file could be useful in case of using an HMM profile not trained with your sequences which can not detect some sequences.
+	- X_genomic_exon_proteins.fasta: contains the exons sequences joined into genes in the aforementioned file
+	- Additional generated files are stored for pipeline debugging and controls
+
+
+About PAIP output:
+The obtained proteins could be used for further prospective analyses or to facilitate a more curated annotation using genome annotation editors. However, a first validation of the obtained proteins should be performed, more specifically those obtained newly from genome (taking into account the parameter used to join putative exons, to split putative joined genes or join exons from the same gene).
+Such validation could consist in aligning all proteins and checking the MSA, constructing the phylogeny of the gene with related species or the gene family; doing a reduced blast with nr or obtaining structural particularities of the proteins (i.e. characterizing protein domains as transmembrane domains, signal peptides...)
+
+In particular, PAIP basic and genome mode is designed to facilitate the gene annotation in editors as Apollo. For that, the use of the following files would be usefull (see an example in Documentation/example_Apollo.png):
+- Original GFF3
+- Final GFF3 with curated models for the annotated proteins
+- BED file from tblastn files
+
+If sequences contain stop codons, codified as X , it could be artefactual from tblastn hits if they are in the beggining or end of an exon or, otherwise, those genes are probably pseudogenes.
+
+Nonetheless, new proteins identified from unnanotated genomic regions should be properly annotated using genome browser annotation tools such as Apollo. We estimate an approximate number of them and could be use for prospective analyses.
+
+
+####
+Example
+####
+Under construction...
+We added an example with X genome to search two chemosensory gene families.
+
+The two chemosensory gene families are renamed and stored in the DB folder
+All protein, GFF3 and genome files are stored in Files folder
+
+Just run the script master and see the results
+
+$ bash runPAIP.sh 
+
+
+
+####
+Troubleshooting
+####
+
+When PAIP detects any error related to input data, it dies and print the description of the error. Please check the error and your data.
+
+If you are getting errors related to parsing the GFF file, take into account that PAIP expects proteins ID to be as ID in mRNA rows from GFF3. You can modify the perl module Readgff.pm to allow PAIP to read your data. Otherwise, modify the GFF, preferably, as GFF3 format. 
+In case of protein ID and mRNA ID causing error as they are not the same, you can use the script Scripts/gff2fasta_v3.pl to obtain the proteins directly from your GFF with proper names for PAIP. 
+
+In case of getting an endless loading message when uploading the GFF3 files to Apollo, you can try to upload the files named as X_toApollo.gff3 (This GFF3 files do not contain gene field in mRNA and avoid some problems observed when uploading GFF to Apollo via web import)
+
+If you can not solve the error, create an issue in Github specifying the error and all details as possible.
