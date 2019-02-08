@@ -107,7 +107,7 @@ while (<File>) {
 ###new - ordering CDS
 		my $n = 1;
 
-		my @positions = keys ($gffcds{$gene});
+		my @positions = keys (%{$gffcds{$gene}});
 		my @posorder;
 
 		if ($subl2[6] =~ /\+/){ # Forward strand
@@ -163,7 +163,7 @@ while (<File>) {
 		my $ifix = 0;
 
 
-		my @positions = keys ($gffcds{$gene});
+		my @positions = keys (%{$gffcds{$gene}});
 		my @posorder;
 
 		if ($subl2[6] =~ /\+/){ # Forward strand
