@@ -97,11 +97,11 @@ while (<File>) {
 				}
 			}
 			else {
-				die "ERROR in $dirname/check_data.pl: Protein gene $gene nor $genenew is not found in the GFF3\nYou can run the following script to check which proteins are not annotated in the GFF, or contain different name in mRNA|transcript field in the GFF\nperl $dirname/Tools/get_proteins_notfound_ingff.pl $gff $proteome\nIf your GFF comes from NCBI, you propably need to reformat to assign protein ID in mRNA and CDS fields. For that, you can use the following Script and input the formatted GFF in PAIP\nperl $dirname/Tools/reformat_ncbi_gff.pl $gff\n";
+				die "ERROR in $dirname/check_data.pl: Protein gene $gene nor $genenew is not found in the GFF3\nIf your GFF comes from NCBI, you propably need to reformat to assign protein ID in mRNA and CDS fields. For that, you can use the following Script and input the formatted GFF in PAIP\nperl $dirname/Tools/reformat_ncbi_gff.pl $gff\nOtherwise, if this error keeps showing, You can run the following script to check which proteins are not annotated in the GFF, or contain different name in mRNA|transcript field in the GFF to explore the data. You can use the outfile_ingff.fasta tu use only anotated sequences in PAIP\nperl $dirname/Tools/get_proteins_notfound_ingff.pl $gff $proteome\n\n";
 			}
 
 		} else {
-			die "ERROR in $dirname/check_data.pl: Protein gene $gene is not found in the GFF3\nYou can run the following script to check which proteins are not annotated in the GFF, or contain different name in mRNA|transcript field as ID\nperl $dirname/Tools/get_proteins_notfound_ingff.pl $gff $proteome\nIf your GFF comes from NCBI, you propably need to reformat to assign protein ID in mRNA and CDS fields. For that, you can use the following Script and input the formatted GFF in PAIP\nperl $dirname/Tools/reformat_ncbi_gff.pl $gff\n";
+			die "ERROR in $dirname/check_data.pl: Protein gene $gene is not found in the GFF3\nIf your GFF comes from NCBI, you propably need to reformat to assign protein ID in mRNA and CDS fields. For that, you can use the following Script and input the formatted GFF in PAIP\nperl $dirname/Tools/reformat_ncbi_gff.pl $gff\nOtherwise, if this error keeps showing, You can run the following script to check which proteins are not annotated in the GFF, or contain different name in mRNA|transcript field in the GFF to explore the data. You can use the outfile_ingff.fasta tu use only anotated sequences in PAIP\nperl $dirname/Tools/get_proteins_notfound_ingff.pl $gff $proteome\n\n";
 		}
 	}	
 }
