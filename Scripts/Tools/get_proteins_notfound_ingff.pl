@@ -104,7 +104,7 @@ close Resultsb;
 
 my $tot = $ok + $notok;
 
-print "Identified $tot protein sequences in $protome\n";
+print "Identified $tot protein sequences in $proteome\n";
 print "Saved $ok proteins with GFF annotation in $proteome\_ingff.fasta\n";
 print "Saved $notok proteins without GFF annotation in $proteome\_nogff.fasta\n";
 print "Done\n\n";
