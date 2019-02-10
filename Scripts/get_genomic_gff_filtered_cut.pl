@@ -291,7 +291,8 @@ while (<File>) {
 
 
 			if ($inicuted > $subl3[4]){ # en el caso de restar demasiado
-				$inicuted = $subl3[4] - $subl3[7] ;
+				#$inicuted = $subl3[4] - $subl3[7] ; # salen mal las que empiezan el hmm en pos:1-X
+				$inicuted = $subl3[4];
 			}
 
 
