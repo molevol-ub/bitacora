@@ -127,9 +127,9 @@ close File;
 #print Results "END	END	mRNA	x	x	.	.	.	X\n";
 close Results;
 
-# It prints now the genes cut according to hitted positions
+# It prints now the genes trimmed according to hit positions
 
-open (Results, ">", "$ARGV[3]\_annot_genes_cut.gff3");
+open (Results, ">", "$ARGV[3]\_annot_genes_trimmed.gff3");
 
 open (File , "<", $ARGV[2]); 
 while (<File>) {
@@ -370,10 +370,9 @@ close Results;
 
 
 #Codify proteins and CDS from the generated GFFs
-#system ("perl $dirname/gff2fasta_v2.pl $genome $ARGV[3]\_annot_genes_cut.gff3 $ARGV[3]gffcut");
-#system ("perl $dirname/reconvert_fasta.pl $ARGV[3]gffcut\.pep.fasta");
-system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_annot_genes_cut.gff3 $ARGV[3]gffcut");
-#system ("perl gff2fasta_v2.pl $genome $ARGV[3]\_annot_genes.gff3 $ARGV[3]"."gff");
+
+system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_annot_genes_trimmed.gff3 $ARGV[3]gfftrimmed");
+
 
 
 

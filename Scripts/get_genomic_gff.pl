@@ -4,7 +4,7 @@ use warnings;
 use File::Basename;
 my $dirname = dirname(__FILE__);
 
-#usage: perl get_genomic_gff.pl X_genomic_genes_hmmerparsed_proteins_cuted.fasta Xtblastn_parsed_list_genomic_positions.txt nameout Genome_fasta
+#usage: perl get_genomic_gff.pl X_genomic_genes_hmmerparsed_proteins_trimmed.fasta Xtblastn_parsed_list_genomic_positions.txt nameout Genome_fasta
 
 
 my $genome = $ARGV[3];

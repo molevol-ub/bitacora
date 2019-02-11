@@ -90,7 +90,7 @@ print Chemcounts2"Gene\/Gene Family\tNumber of annotated genes Identified\tNumbe
 
 foreach my $chem (@chemosensory){
 	print "\n----------------- Starting $chem Genomic Gene Identification and Annotation\n";
-	system ("cat $chemdir\/$chem\_db\.fasta $chem\/$chem\_proteins_cut.fasta > $chem\/$chem\_db_masannot.fasta");
+	system ("cat $chemdir\/$chem\_db\.fasta $chem\/$chem\_proteins_trimmed.fasta > $chem\/$chem\_db_masannot.fasta");
 
 	# run tblastn
 	print "Doing $chem tblastn\n";
@@ -120,9 +120,9 @@ foreach my $chem (@chemosensory){
 	if ($nonew == 0){
 		print "No $chem identified in unannotated genomic regions\n";
 
-		system ("cp $chem/$chem\_proteins_cut.fasta $chem/$chem\_genomic_and_annotated_proteins_cut.fasta");
-		open (NRfasta, ">", "$chem/$chem\_genomic_and_annotated_proteins_cut_nr.fasta");
-		open (File, "<", "$chem/$chem\_genomic_and_annotated_proteins_cut.fasta");
+		system ("cp $chem/$chem\_proteins_trimmed.fasta $chem/$chem\_genomic_and_annotated_proteins_trimmed.fasta");
+		open (NRfasta, ">", "$chem/$chem\_genomic_and_annotated_proteins_trimmed_nr.fasta");
+		open (File, "<", "$chem/$chem\_genomic_and_annotated_proteins_trimmed.fasta");
 		my $totalnrseqs = "0";
 		my $totalseqs = "0";
 		my %fasta_annot;
@@ -180,8 +180,8 @@ foreach my $chem (@chemosensory){
 		print Chemcounts2 "$chem\t$totalseqs\t0\t$totalseqs\t$totalnrseqs\n";
 
 		# Creating a final GFF for all annotations
-		system("perl $dirname/get_nr_gff_only1gff.pl $chem/$chem\_genomic_and_annotated_proteins_cut_nr.fasta $chem/$chem\_annot_genes_cut.gff3 $chem/$chem");
-		system("cat $chem/$chem\_annot_genes_cut.gff3 |  sed '/^END\tEND\tmRNA/d' > $chem/$chem\_genomic_and_annotated_genes.gff3");
+		system("perl $dirname/get_nr_gff_only1gff.pl $chem/$chem\_genomic_and_annotated_proteins_trimmed_nr.fasta $chem/$chem\_annot_genes_trimmed.gff3 $chem/$chem");
+		system("cat $chem/$chem\_annot_genes_trimmed.gff3 |  sed '/^END\tEND\tmRNA/d' > $chem/$chem\_genomic_and_annotated_genes.gff3");
 
 
 		print "----------------- $chem DONE\n\n";
@@ -202,14 +202,14 @@ foreach my $chem (@chemosensory){
 	system ("hmmsearch -o $chem\/hmmer\/$name\_genomic_genes\_$chem\.out --notextw --tblout $chem\/hmmer\/$name\_genomic_genes_$chem\.tblout --domtblout $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chemdir\/$chem\_db\.hmm $chem/$chem\_genomic_genes_proteins.fasta");
 	system ("perl $dirname/get_genomic_hmmer_parsed.pl $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chem/$chem\_genomic_genes $evalue");
 	system ("perl $dirname/get_fasta_fromalist.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed");
-	system ("perl $dirname/get_genomic_fasta_cut.pl $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed");
+	system ("perl $dirname/get_genomic_fasta_trimmed.pl $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed");
 
 	# Removing putative new sequences already annotated (i.e. duplicated regions due to assembly artifacts)
 
 	#print "Doing $chem blast genomic vs anotated $chem\n";
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem\_proteins\_cut.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
 
-	open (File, "<", "$chem/$chem\_proteins\_cut.fasta");
+	open (File, "<", "$chem/$chem\_proteins\_trimmed.fasta");
 	my %fasta_annot;
 	my $fastaname;
 	while (<File>) {
@@ -225,7 +225,7 @@ foreach my $chem (@chemosensory){
 	}
 	close File;
 
-	open (File, "<", "$chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta");
+	open (File, "<", "$chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta");
 	my %fasta_genomic;
 	my $genomic_count = 0;
 	while (<File>) {
@@ -258,7 +258,7 @@ foreach my $chem (@chemosensory){
 
 	my $annotingenomic = 0;
 	my $totalannotgenomic = 0;
-	open (Results, ">", "$chem/$chem\_genomic_and_annotated_proteins_cut.fasta");
+	open (Results, ">", "$chem/$chem\_genomic_and_annotated_proteins_trimmed.fasta");
 	foreach my $key (sort keys %fasta_annot){
 		if (exists $blast_relation{$key}){
 			print Results ">$key $blast_relation{$key}\n$fasta_annot{$key}\n";	
@@ -276,13 +276,13 @@ foreach my $chem (@chemosensory){
 	}
 
 	# Checking now with annotated proteins not annotated in phase 1
-	open (ResultsNotannot, ">", "$chem/$chem\_genomic_not_$chem\_annotated\_proteins_cut.fasta");
+	open (ResultsNotannot, ">", "$chem/$chem\_genomic_not_$chem\_annotated\_proteins_trimmed.fasta");
 	foreach my $key (sort keys %fasta_genomic){
 		print ResultsNotannot ">$key\n$fasta_genomic{$key}\n";
 	}
 	close ResultsNotannot;
 	#print "Doing $chem blast genomic proteins vs all anotated proteins\n";
-	system ("blastp -query $chem/$chem\_genomic_not_$chem\_annotated\_proteins_cut.fasta -db $transcripts -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -num_threads $threads -out $chem/$chem\_genomicnotAnnotVsAllproteome.outfmt6");
+	system ("blastp -query $chem/$chem\_genomic_not_$chem\_annotated\_proteins_trimmed.fasta -db $transcripts -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -num_threads $threads -out $chem/$chem\_genomicnotAnnotVsAllproteome.outfmt6");
 	open (Blast, "<", "$chem/$chem\_genomicnotAnnotVsAllproteome.outfmt6");
 	my $deletedgenomic = 0;
 	while (<Blast>){
@@ -360,8 +360,8 @@ foreach my $chem (@chemosensory){
 
 	# Creating a final file with non-redundant sequences (i.e. isoforms, sequences from duplicated scaffolds...)
 
-	open (NRfasta, ">", "$chem/$chem\_genomic_and_annotated_proteins_cut_nr.fasta");
-	open (File, "<", "$chem/$chem\_genomic_and_annotated_proteins_cut.fasta");
+	open (NRfasta, ">", "$chem/$chem\_genomic_and_annotated_proteins_trimmed_nr.fasta");
+	open (File, "<", "$chem/$chem\_genomic_and_annotated_proteins_trimmed.fasta");
 	my $totalnrseqs = "0";
 	my @sequences = ();
 	while (<File>) {
@@ -403,18 +403,18 @@ foreach my $chem (@chemosensory){
 
 	## Generating a GFF for genomic genes
 
-	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_genomic_gff_filtered_cut.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
+	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
+	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem"."gffgenomiccut.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
+	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem"."gffgenomictrimmed.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
+	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 
 	# Creating a final GFF for all annotations
-	system("perl $dirname/get_nr_gff.pl $chem/$chem\_genomic_and_annotated_proteins_cut_nr.fasta $chem/$chem\_annot_genes_cut.gff3 $chem/$chem\_genomic_genes_cut.gff3 $chem/$chem");
-	system("cat $chem/$chem\_annot_genes_cut.gff3 $chem/$chem\_genomic_genes_cut.gff3 |  sed '/^END\tEND\tmRNA/d' > $chem/$chem\_genomic_and_annotated_genes.gff3");
+	system("perl $dirname/get_nr_gff.pl $chem/$chem\_genomic_and_annotated_proteins_trimmed_nr.fasta $chem/$chem\_annot_genes_trimmed.gff3 $chem/$chem\_genomic_genes_trimmed.gff3 $chem/$chem");
+	system("cat $chem/$chem\_annot_genes_trimmed.gff3 $chem/$chem\_genomic_genes_trimmed.gff3 |  sed '/^END\tEND\tmRNA/d' > $chem/$chem\_genomic_and_annotated_genes.gff3");
 
 	print "----------------- $chem DONE\n\n";
 

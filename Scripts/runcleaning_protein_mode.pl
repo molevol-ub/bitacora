@@ -34,10 +34,11 @@ close File;
 
 foreach my $chem (@chemosensory){
 	system ("mkdir -p $chem\/Intermediate_files");
+	system ("rm -rf $chem\/Intermediate_files/hmmer 2>/dev/null");
 
 	# Moving Files
 	system("mv $chem\/* $chem\/Intermediate_files/ 2>/dev/null");
-	system("mv $chem\/Intermediate_files/*proteins_cut.fasta $chem\/");
+	system("mv $chem\/Intermediate_files/*proteins_trimmed.fasta $chem\/");
 
 }
 

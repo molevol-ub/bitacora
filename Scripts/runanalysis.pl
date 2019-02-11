@@ -66,7 +66,7 @@ if ($indexed == 3){
 
 
 open (Chemcounts, ">", "$name\_genecounts_annotatedproteins.txt");
-print Chemcounts"Gene\/Gene Family\tNumber of Genes Identified\tAverage Length of Annotated Proteins\tAverage Length of Original Raw Proteins\n";
+print Chemcounts"Gene\/Gene Family\tNumber of Genes Identified\tAverage Length of Trimmed Annotated Proteins\tAverage Length of Original Raw Proteins\n";
 
 foreach my $chem (@chemosensory){
 	print "\n----------------- Starting $chem Protein Identification and Annotation\n";	
@@ -92,19 +92,19 @@ foreach my $chem (@chemosensory){
 	system ("cat $chem/$chem"."blastp_parsed_list.txt $chem/$chem"."hmmer_parsed_list.txt > $chem/$chem\_allsearches_list.txt");
 	system ("perl $dirname/get_blast_hmmer_combined.pl $chem/$chem\_allsearches_list.txt $chem/$chem");
 
-	# Obtaining raw original and cut protein sequences
+	# Obtaining raw original and trimming protein sequences
 
 	system ("perl $dirname/get_fasta_fromalist_v2.pl $transcripts $chem/$chem\_combinedsearches_list.txt $chem/$chem"); 
-	system ("perl $dirname/get_fasta_cut.pl $chem/$chem\_combinedsearches_list.txt $chem/$chem\_proteins.fasta $chem/$chem"); 
+	system ("perl $dirname/get_fasta_trimmed.pl $chem/$chem\_combinedsearches_list.txt $chem/$chem\_proteins.fasta $chem/$chem"); 
 
-	# Generating a GFF3 for the identified and reannotated (cut) proteins
+	# Generating a GFF3 for the identified and reannotated (trimmed) proteins
 
 	system ("perl $dirname/get_annot_genes_gff_v2.pl $gff $genome $chem/$chem\_combinedsearches_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 
-	system ("blastp -query $chem/$chem\_proteins_cut.fasta -subject $chem/$chem"."gffcut.pep.fasta -out $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_proteins_cut.fasta $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 $chem\/$chem");
+	system ("blastp -query $chem/$chem\_proteins_trimmed.fasta -subject $chem/$chem"."gfftrimmed.pep.fasta -out $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
+	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_proteins_trimmed.fasta $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 $chem\/$chem");
 
 
 	# Counting numbers

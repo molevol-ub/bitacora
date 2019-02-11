@@ -90,10 +90,10 @@ foreach my $chem (@chemosensory){
 	system ("cat $chem/$chem"."blastp_parsed_list.txt $chem/$chem"."hmmer_parsed_list.txt > $chem/$chem\_allsearches_list.txt");
 	system ("perl $dirname/get_blast_hmmer_combined.pl $chem/$chem\_allsearches_list.txt $chem/$chem");
 
-	# Obtaining raw original and cut protein sequences
+	# Obtaining raw original and trimming protein sequences
 
 	system ("perl $dirname/get_fasta_fromalist_v2.pl $transcripts $chem/$chem\_combinedsearches_list.txt $chem/$chem"); 
-	system ("perl $dirname/get_fasta_cut.pl $chem/$chem\_combinedsearches_list.txt $chem/$chem\_proteins.fasta $chem/$chem");
+	system ("perl $dirname/get_fasta_trimmed.pl $chem/$chem\_combinedsearches_list.txt $chem/$chem\_proteins.fasta $chem/$chem");
 
 
 	# Counting numbers

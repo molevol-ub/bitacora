@@ -134,10 +134,10 @@ foreach my $chem (@chemosensory){
 	system ("hmmsearch -o $chem\/hmmer\/$name\_genomic_genes\_$chem\.out --notextw --tblout $chem\/hmmer\/$name\_genomic_genes_$chem\.tblout --domtblout $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chemdir\/$chem\_db\.hmm $chem/$chem\_genomic_genes_proteins.fasta");
 	system ("perl $dirname/get_genomic_hmmer_parsed.pl $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chem/$chem\_genomic_genes $evalue");
 	system ("perl $dirname/get_fasta_fromalist.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed");
-	system ("perl $dirname/get_genomic_fasta_cut.pl $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed");
+	system ("perl $dirname/get_genomic_fasta_trimmed.pl $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed");
 
 
-	open (File, "<", "$chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta");
+	open (File, "<", "$chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta");
 	my %fasta_genomic;
 	my $fastaname;
 	my $genomic_count = 0;
@@ -155,13 +155,13 @@ foreach my $chem (@chemosensory){
 	}
 	close File;
 
-	system("cp $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem/$chem\_genomic_proteins_cut.fasta");
+	system("cp $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem\_genomic_proteins_trimmed.fasta");
 
 
 	# Creating a final file with non-redundant sequences (i.e. isoforms, sequences from duplicated scaffolds...)
 
-	open (NRfasta, ">", "$chem/$chem\_genomic_proteins_cut_nr.fasta");
-	open (File, "<", "$chem/$chem\_genomic_proteins_cut.fasta");
+	open (NRfasta, ">", "$chem/$chem\_genomic_proteins_trimmed_nr.fasta");
+	open (File, "<", "$chem/$chem\_genomic_proteins_trimmed.fasta");
 	my $totalnrseqs = "0";
 	my @sequences = ();
 	while (<File>) {
@@ -193,18 +193,18 @@ foreach my $chem (@chemosensory){
 
 	## Generating a GFF for genomic genes
 
-	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_genomic_gff_filtered_cut.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
+	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
+	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta -subject $chem/$chem"."gffgenomiccut.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_cut.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
+	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem"."gffgenomictrimmed.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
+	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 
 	# Creating a final GFF for all annotations
-	system("perl $dirname/get_nr_gff_only1gff.pl $chem/$chem\_genomic_proteins_cut_nr.fasta $chem/$chem\_genomic_genes_cut.gff3 $chem/$chem");
-	system("mv $chem/$chem\_genomic_and_annotated_genes_nr.gff3 $chem/$chem\_genomic_genes_cut_nr.gff3");
+	system("perl $dirname/get_nr_gff_only1gff.pl $chem/$chem\_genomic_proteins_trimmed_nr.fasta $chem/$chem\_genomic_genes_trimmed.gff3 $chem/$chem");
+	system("mv $chem/$chem\_genomic_and_annotated_genes_nr.gff3 $chem/$chem\_genomic_genes_trimmed_nr.gff3");
 
 	print "----------------- $chem DONE\n\n";
 

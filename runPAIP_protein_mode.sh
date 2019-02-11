@@ -66,7 +66,7 @@ THREADS=1
 ##			   	        PIPELINE 						##
 ##########################################################
 
-echo -e "\n#######################  Running PAIP  #######################";
+echo -e "\n#######################  Running PAIP Protein mode  #######################";
 echo "PAIP protein-mode version $VERSION";
 date
 
@@ -111,7 +111,7 @@ if [ $CLEAN = "T" ]; then
 fi
 
 
-rm PAIPstd.err
+#rm PAIPstd.err
 
 echo -e "PAIP completed without errors :)";
 date

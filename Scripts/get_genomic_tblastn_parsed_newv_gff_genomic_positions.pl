@@ -176,7 +176,7 @@ foreach my $key (sort keys %hits) {
 					$n = 0;
 					last;	
 				}
-				elsif ($ini <= $subhit[1] && $fin <= $subhit[2] && $fin >= ($subhit[1]-30)){
+				elsif ($ini <= $subhit[1] && $fin <= $subhit[2] && $fin >= ($subhit[1]-10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -185,7 +185,7 @@ foreach my $key (sort keys %hits) {
 					$n = 0;
 					last;	
 				}
-				elsif ($ini >= $subhit[1] && $fin >= $subhit[2] && $ini <= ($subhit[2]+30)){
+				elsif ($ini >= $subhit[1] && $fin >= $subhit[2] && $ini <= ($subhit[2]+10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -194,7 +194,7 @@ foreach my $key (sort keys %hits) {
 					$n = 0;
 					last;	
 				}
-				elsif ($ini <= $subhit[1] && $ini >= ($subhit[1] - 30)){
+				elsif ($ini <= $subhit[1] && $ini >= ($subhit[1] - 10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -203,7 +203,7 @@ foreach my $key (sort keys %hits) {
 					$n = 0;
 					last;	
 				}
-				elsif ($fin >= $subhit[2] && $fin <= ($subhit[2] + 30)){
+				elsif ($fin >= $subhit[2] && $fin <= ($subhit[2] + 10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -278,7 +278,7 @@ foreach my $key (sort keys %hits_parsed) {
 					$n = 0;
 					last;	
 				}
-				elsif ($ini <= $subhit[1] && $fin <= $subhit[2] && $fin >= ($subhit[1]-30)){
+				elsif ($ini <= $subhit[1] && $fin <= $subhit[2] && $fin >= ($subhit[1]-10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -287,7 +287,7 @@ foreach my $key (sort keys %hits_parsed) {
 					$n = 0;
 					last;	
 				}
-				elsif ($ini >= $subhit[1] && $fin >= $subhit[2] && $ini <= ($subhit[2]+30)){
+				elsif ($ini >= $subhit[1] && $fin >= $subhit[2] && $ini <= ($subhit[2]+10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -296,7 +296,7 @@ foreach my $key (sort keys %hits_parsed) {
 					$n = 0;
 					last;	
 				}
-				elsif ($ini <= $subhit[1] && $ini >= ($subhit[1] - 30)){
+				elsif ($ini <= $subhit[1] && $ini >= ($subhit[1] - 10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;
@@ -305,7 +305,7 @@ foreach my $key (sort keys %hits_parsed) {
 					$n = 0;
 					last;	
 				}
-				elsif ($fin >= $subhit[2] && $fin <= ($subhit[2] + 30)){
+				elsif ($fin >= $subhit[2] && $fin <= ($subhit[2] + 10)){
 					unless ($frame == $subhit[0]){ #Nuevo filtro para no alargar si los frames son distintos
 						$n = 0;
 						last;

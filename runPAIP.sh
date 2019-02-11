@@ -57,8 +57,8 @@ CLEAN=T
 # You can modify the E-value used to filter BLAST and HMMER. Default is 1e-5
 EVALUE=1e-5
 
-# Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom). 
-# The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific dataset. See the manual for more details.
+# Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom) 
+# The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific dataset. See the manual for more details
 MAXINTRON=16000
 
 # Number of threads to be used in blast searches

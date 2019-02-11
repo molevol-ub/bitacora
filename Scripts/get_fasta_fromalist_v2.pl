@@ -4,7 +4,7 @@ use warnings;
 
 # Obtain fasta sequences from a file
 
-# V2: If proteins contain two putative separate proteins, it cuts into X proteins: name must be X_splitN
+# V2: If proteins contain two putative separate proteins, it trims into X proteins: name must be X_splitN
 
 my ($name, $line, $nameout, $contig);
 my %fasta;
