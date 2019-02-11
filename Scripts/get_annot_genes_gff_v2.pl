@@ -240,7 +240,7 @@ while (<File>) {
 
 
 			if ($inicuted < $subl3[3]){ # en el caso de restar demasiado
-				$inicuted = $subl3[3];
+				$inicuted = $subl3[3] + $subl[7];
 			}
 
 
