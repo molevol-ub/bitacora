@@ -35,8 +35,8 @@ while (<GFFfile>) {
 
 		$idpar{$id} = $parentid;
 
-		print Results "$subline[0]\t$subline[1]\tgene\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t$subline[7]\tgene id \"$parentid\"; gene type \"protein_coding\";\n";	
-		print Results "$subline[0]\t$subline[1]\ttranscript\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t$subline[7]\tgene id \"$parentid\"; transcript id \"$id\"; gene type \"protein_coding\";\n";	
+		print Results "$subline[0]\t$subline[1]\tgene\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t$subline[7]\tgene_id \"$parentid\"; gene_type \"protein_coding\";\n";	
+		print Results "$subline[0]\t$subline[1]\ttranscript\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t$subline[7]\tgene_id \"$parentid\"; transcript_id \"$id\"; gene_type \"protein_coding\";\n";	
 
 		$exoncount{$id} = 0;
 
@@ -57,8 +57,8 @@ while (<GFFfile>) {
 
 		$exoncount{$id}++;
 
-		print Results "$subline[0]\t$subline[1]\texon\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t\.\tgene id \"$parentid\"; transcript id \"$id\"; exon number \"$exoncount{$id}\"; gene type \"protein_coding\";\n";	
-		print Results "$subline[0]\t$subline[1]\tCDS\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t$subline[7]\tgene id \"$parentid\"; transcript id \"$id\"; exon number \"$exoncount{$id}\"; gene type \"protein_coding\";\n";	
+		print Results "$subline[0]\t$subline[1]\texon\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t\.\tgene_id \"$parentid\"; transcript_id \"$id\"; exon_number \"$exoncount{$id}\"; gene_type \"protein_coding\";\n";	
+		print Results "$subline[0]\t$subline[1]\tCDS\t$subline[3]\t$subline[4]\t$subline[5]\t$subline[6]\t$subline[7]\tgene_id \"$parentid\"; transcript_id \"$id\"; exon_number \"$exoncount{$id}\"; gene_type \"protein_coding\";\n";	
 
 	}
 

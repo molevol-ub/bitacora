@@ -50,6 +50,9 @@ foreach my $gene (@genomegenes){
 
 		my @cdsline;
 		my $initialcds = 0;
+
+		my $ncds = 1;
+
 		foreach my $ex (@exon){
 			my $gen = "$scaf\_$ex";
 			next if ($ex =~ /dom/); # Ignore information about domains, not an exon to read
@@ -80,8 +83,11 @@ foreach my $gene (@genomegenes){
 					$inicds = $col[3];
 				#}
 
+				my $cdsid = "$gen.CDS$ncds";
+				$ncds++;
 
-				push (@cdsline, join("\t", $scaf,"GenomicGFF","CDS",$inicds,$col[4],".",$chain,$frame,"ID=$gen;Parent=$gene;"));
+
+				push (@cdsline, join("\t", $scaf,"GenomicGFF","CDS",$inicds,$col[4],".",$chain,$frame,"ID=$cdsid;Parent=$gene;"));
 				#push (@cdsline, join("\t", $scaf,"GenomicGFF","CDS",$inicds,$col[4],".",$chain,"0","ID=$gen;Parent=$gene;")); # Debugging, replacing frame to 0 to test
 
 				if ($ini > $col[3]){
