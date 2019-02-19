@@ -37,7 +37,7 @@ while (<File>) {
 	my $geneparent = "";
 	if ($subline[0] =~ /(\S+)(\_split\d+)/){
 		$gene = $1;
-		$geneparent = $subline[0];
+		$geneparent = $gene;
 	} else {
 		$gene = $subline[0];
 	}
@@ -52,7 +52,7 @@ while (<File>) {
 		} elsif ($gene =~ /(\S+)\.t\d+$/){
 			$geneparent = $1;
 		} else {
-		#	die "No encuentro gene parent en $gene en $line\n";
+		#	die "cannot find gene parent in $gene in $line\n";
 			$geneparent = "gene_$gene";
 		}
 	}
@@ -142,7 +142,7 @@ while (<File>) {
 	my $geneparent = "";
 	if ($subline[0] =~ /(\S+)(\_split\d+)/){
 		$gene = $1;
-		$geneparent = $subline[0];
+		$geneparent = $gene;
 	} else {
 		$gene = $subline[0];
 	}
@@ -157,7 +157,7 @@ while (<File>) {
 		} elsif ($gene =~ /(\S+)\.t\d+$/){
 			$geneparent = $1;
 		} else {
-		#	die "No encuentro gene parent en $gene en $line\n";
+		#	die "cannot find gene parent in $gene in $line\n";
 			$geneparent = "gene_$gene";
 		}
 	}
@@ -210,7 +210,7 @@ while (<File>) {
 			} else {
 				$cdsid = "$subline[0]"."CDS$ncds";
 				$ncds++;
-			#	die "No encuentro nombre correcto cds";
+			#	die "Cannot find proper name for cds\n";
 			}
 
 			$ifix += 2; 
