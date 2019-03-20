@@ -46,7 +46,7 @@ foreach my $key (sort keys %blast) {
 			}
 		}
 
-		if ($subline[2] >= $filtro1 || $subline[2] >= $filtro2) { # BLAST filtering: o que cubra 2/3 del subject o sea más de un 80% del query
+		if ($subline[2] >= $filtro1 || $subline[2] >= $filtro2) { # BLAST filtering: alignment covering 2/3 of subject, or 80% of query
 			$hitlvl = "2";
 			my $n = 0;
 			my $extrahit = 0;

@@ -7,12 +7,17 @@ use warnings;
 # usage: perl get_intron_size_fromgff.pl gff3_file
 
 
-die "Usage: insert the GFF to estimate intron length statistics. You can modify inside the script the intron length to calculate the number of introns longer than the input number. Default is 16,000 bp\n" unless @ARGV == 1;
+die "Usage: insert the GFF to estimate intron length statistics. You can modify inside the script the intron length to calculate the number of introns longer than the input number. Default is 15,000 bp\n" unless @ARGV == 1;
 
 
-### Edit this variable to test number of introns longer than the specified number. Default is 16,000 bp
-my $maxintronlength = "16000";
+#######################################################################################################
+# Edit this variable to test number of introns longer than the specified number. Default is 16,000 bp #
+#######################################################################################################
+
+my $maxintronlength = "15000";
+
 ###
+
 
 my $totalintrons = 0;
 my $totalintronsize = 0;
@@ -85,7 +90,11 @@ if(scalar(@exons)>2){
 my $avelength = sprintf("%.4f", $totalintronsize/$totalintrons);
 my $longerperc =  sprintf("%.4f", (($longerintrons/$totalintrons) * 100));
 my $medianlength = median(@intronslength);
-print "Totalintrons: $totalintrons\nAverageIntronLength: $avelength\nMedianIntronLength: $medianlength\nMaxIntronLength: $maxintron\nMinIntronLength: $minintron\nIntronLongerThan$maxintronlength"."bp: $longerintrons\n";
+my $perc95 = percentile95(@intronslength);
+my $perc99 = percentile99(@intronslength);
+print "Totalintrons: $totalintrons\nAverageIntronLength: $avelength\nMedianIntronLength: $medianlength\n";
+print "Percentile95 IntronLength: $perc95\nPercentile99 IntronLength: $perc99\n";
+print "MaxIntronLength: $maxintron\nMinIntronLength: $minintron\nIntronLongerThan$maxintronlength"."bp: $longerintrons\n";
 print "PercentLongerIntrons:$longerperc%\n";
 
 sub median
@@ -102,5 +111,18 @@ sub median
     }
 }
 
+sub percentile95
+{
+    my @vals = sort {$a <=> $b} @_;
+    my $len = @vals;
+    my $perc = $len*0.95;
+    return ($vals[int($perc)]);
+}
 
-
+sub percentile99
+{
+    my @vals = sort {$a <=> $b} @_;
+    my $len = @vals;
+    my $perc = $len*0.99;
+    return ($vals[int($perc)]);
+}
