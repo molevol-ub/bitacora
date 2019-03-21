@@ -42,7 +42,7 @@ GFFFILE=/path/to/GFF.gff3
 # Include the fasta file containing the annotated proteins
 PROTFILE=/path/to/protein.fasta
 
-# Include the folder containing the QUERY database (Including a fasta and HMM file named as QUERY_db.fasta and QUERY_db.hmm); Multiple query DB can be included in the folder to be searched
+# Include the folder containing the FPDB databases (Including a fasta and HMM file named as YOURFPDB_db.fasta and YOURFPDB_db.hmm); Multiple FPDB can be included in the folder to be searched
 QUERYDIR=/path/to/query_folder
 
 
