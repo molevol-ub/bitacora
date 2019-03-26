@@ -5,7 +5,7 @@ use File::Basename;
 use lib dirname (__FILE__);
 my $dirname = dirname(__FILE__);
 
-# Script to check if input data is OK and parseable by PAIP
+# Script to check if input data is OK and parseable by BITACORA
 
 # usage: perl Scripts/check_data_genome_mode.pl $genome query_directory
 

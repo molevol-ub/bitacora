@@ -59,7 +59,7 @@ while (<File>) {
 			if (exists $gffcds{$gene}){
 				#OK
 			} else {
-				print "WARNING: Gene $gene does not contain any CDS sequence in GFF file. Please check your GFF\nThis Warning will cause ERROR in PAIP\n";
+				print "WARNING: Gene $gene does not contain any CDS sequence in GFF file. Please check your GFF\nThis Warning will cause ERROR in BITACORA\n";
 			}
 
 
@@ -73,7 +73,7 @@ while (<File>) {
 				if (exists $gffcds{$genenew}){
 					#OK
 				} else {
-					print "WARNING: Gene $gene does not contain any CDS sequence in GFF file. Please check your GFF\nThis Warning will cause ERROR in PAIP\n";
+					print "WARNING: Gene $gene does not contain any CDS sequence in GFF file. Please check your GFF\nThis Warning will cause ERROR in BITACORA\n";
 				}
 			} else {
 				$notok++;

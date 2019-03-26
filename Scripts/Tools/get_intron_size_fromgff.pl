@@ -11,7 +11,7 @@ die "Usage: insert the GFF to estimate intron length statistics. You can modify 
 
 
 #######################################################################################################
-# Edit this variable to test number of introns longer than the specified number. Default is 16,000 bp #
+# Edit this variable to test number of introns longer than the specified number. Default is 15,000 bp #
 #######################################################################################################
 
 my $maxintronlength = "15000";

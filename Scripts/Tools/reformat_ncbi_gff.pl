@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-# Script to reformat a NCBI GFF to be parseable by PAIP. It searchs for the protein name and renames all genes, mRNA and CDS in the GFF
+# Script to reformat a NCBI GFF to be parsable by BITACORA. It searchs for the protein name and renames all genes, mRNA and CDS in the GFF
 
 # Usage: perl reformat_ncbi_gff.pl gfffile
 
