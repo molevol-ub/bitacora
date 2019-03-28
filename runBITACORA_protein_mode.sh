@@ -2,12 +2,12 @@
 
 ##########################################################
 ##                                                      ##
-##                       BITACORA			##
-##							##
-##          Bioinformatics tool to assist the 		##
-## 	comprehensive annotation of gene families	##
-##                                         		##
-##						        ##
+##                       BITACORA                       ##
+##                                                      ##
+##          Bioinformatics tool to assist the           ##
+##      comprehensive annotation of gene families       ##
+##                                                      ##
+##                                                      ##
 ## Developed by Joel Vizueta                            ##
 ## Contact: via github or jvizueta@ub.edu               ##
 ##                                                      ##
@@ -16,7 +16,7 @@
 VERSION=1.0
 
 ##########################################################
-##    	       EXPORT EXECUTABLES TO PATH 		##
+##              EXPORT EXECUTABLES TO PATH              ##
 ##########################################################
 
 # Perl needs to be installed. 
@@ -29,7 +29,7 @@ export PATH=$PATH:/path/to/hmmer/bin
 SCRIPTDIR=/path/to/Scripts
 
 ##########################################################
-##                  PREPARE THE DATA 			##
+##                   PREPARE THE DATA                   ##
 ##########################################################
 
 # Include here the name of your species. i.e. NAME=Dmel
@@ -45,7 +45,7 @@ QUERYDIR=/path/to/query_folder
 
 
 ##########################################################
-##         	    EDITABLE PARAMETERS			##
+##                 EDITABLE PARAMETERS                  ##
 ##########################################################
 
 # Set CLEAN=T if you want to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the output folder
@@ -59,7 +59,7 @@ THREADS=1
 
 
 ##########################################################
-##      	       HOW TO RUN			##
+##                      HOW TO RUN                      ##
 ##########################################################
 
 # Once you have included all of the above variables, you can run BITACORA as in:
@@ -67,7 +67,7 @@ THREADS=1
 
 
 ##########################################################
-##	             PIPELINE - CODE			##
+##                   PIPELINE - CODE                    ##
 ##########################################################
 
 echo -e "\n#######################  Running BITACORA Protein mode  #######################";

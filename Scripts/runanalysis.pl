@@ -65,7 +65,7 @@ if ($indexed == 3){
 }
 
 
-open (Chemcounts, ">", "$name\_genecounts_annotatedproteins.txt");
+open (Chemcounts, ">", "$name\_genecounts_annotated_proteins.txt");
 print Chemcounts"Gene\/Gene Family\tNumber of Genes Identified\tAverage Length of Trimmed Annotated Proteins\tAverage Length of Original Raw Proteins\n";
 
 foreach my $chem (@chemosensory){
