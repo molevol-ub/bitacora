@@ -27,7 +27,6 @@ Genome annotation is a critical bottleneck in genomic research, especially for t
 
 
 BITACORA is distributed as a multiplatform shell script (runBITACORA.sh) that calls several other perl scripts, which include all functions responsible of performing all pipeline tasks. Hence, it does not require any installation or compilation step.
-You can download all package contents from GitHub: https://github.com/molevol-ub/bitacora or www.ub.edu/softevol/bitacora
 
 To run the pipeline edit the master script runBITACORA.sh variables described in Prerequisites, Data, and Parameters.
 
@@ -51,6 +50,7 @@ Or compile HMMER binaries from the source code: http://hmmer.org/
 HMMER and BLAST binaries require to be added to the PATH environment variable. Specify the correct path to bin folders in the master script runBITACORA.sh, if necessary. 
 $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
+
 
 ## 3. Computational requirements
 
@@ -121,8 +121,8 @@ Under this mode, BITACORA identifies de novo all members of the surveyed family 
 [NOTE: The gene models generated under this mode are only semi-automatic predictions and require further manual annotation, i.e. using genomic annotation editors, such as Apollo. The output file of the genome mode can also be used as protein evidence in automatic annotators as MAKER2 or BRAKER1 (see output section)]
 
 
-## 5. Parameters 
 
+## 5. Parameters 
 
 - The option CLEAN can be used to create the Intermediate_files directory where all intermediate files will be stored (see output section).
 CLEAN=T #T=true, F=false
