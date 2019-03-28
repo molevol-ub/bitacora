@@ -37,20 +37,23 @@ To run the pipeline edit the master script runBITACORA.sh variables described in
 - BLAST: Download blast executables from: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
 
 - HMMER: The easiest way to install HMMER in your system is to type one of the following commands in your terminal:
+```
   % brew install hmmer               # OS/X, HomeBrew
   % port install hmmer               # OS/X, MacPorts
   % apt install hmmer                # Linux (Ubuntu, Debian...)
   % dnf install hmmer                # Linux (Fedora)
   % yum install hmmer                # Linux (older Fedora)
   % conda install -c bioconda hmmer  # Anaconda
+```
 Or compile HMMER binaries from the source code: http://hmmer.org/
 
 - Perl: Perl is installed by default in most operating systems. See https://learn.perl.org/installing/ for installation instructions.
 
 HMMER and BLAST binaries require to be added to the PATH environment variable. Specify the correct path to bin folders in the master script runBITACORA.sh, if necessary. 
+```
 $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
-
+```
 
 ## 3. Computational requirements
 
@@ -69,29 +72,14 @@ Preparing the data: The input files (in plain text) required by BITACORA to run 
 
 #### I. File with genomic sequences in FASTA format
 
-#### II. File with structural annotations in GFF3 format. [NOTE: mRNA or transcript, and CDS are mandatory fields]. 
-
-GFF3 example
-lg1_ord1_scaf1770       AUGUSTUS        gene    13591   13902   0.57    +       .       ID=g1;
-lg1_ord1_scaf1770       AUGUSTUS        mRNA    13591   13902   0.57    +       .       ID=g1.t1;Parent=g1;
-lg1_ord1_scaf1770       AUGUSTUS        start_codon     13591   13593   .       +       0       Parent=g1.t1;
-lg1_ord1_scaf1770       AUGUSTUS        CDS     13591   13902   0.57    +       0       ID=g1.t1.CDS1;Parent=g1.t1
-lg1_ord1_scaf1770       AUGUSTUS        exon    13591   13902   .       +       .       ID=g1.t1.exon1;Parent=g1.t1;
-lg1_ord1_scaf1770       AUGUSTUS        stop_codon      13900   13902   .       +       0       Parent=g1.t1;
-
+#### II. File with structural annotations in GFF3 format
+[NOTE: mRNA or transcript, and CDS are mandatory fields]
 
 BITACORA also accepts other GFF formats, such as Ensembl GFF3 or GTF. [NOTE: GFF formatted files from NCBI can cause errors when processing the data, use the supplied script “reformat_ncbi_gff.pl” (located in the folder /Scripts/Tools) to make the file parsable by BITACORA]. See Troubleshooting in case of getting errors while parsing your GFF.
 
-Ensembl GFF3 example
-AFFK01002511    EnsemblGenomes  gene    761     1018    .       -       .       ID=gene:SMAR013822;assembly_name=Smar1;b
-iotype=protein_coding;logic_name=ensemblgenomes;version=1
-AFFK01002511    EnsemblGenomes  transcript      761     1018    .       -       .       ID=transcript:SMAR013822-RA;Pare
-nt=gene:SMAR013822;assembly_name=Smar1;biotype=protein_coding;logic_name=ensemblgenomes;version=1
-AFFK01002511    EnsemblGenomes  CDS     761     811     .       -       0       Parent=transcript:SMAR013822-RA;assembly_name=Smar1
-AFFK01002511    EnsemblGenomes  exon    761     811     .       -       .       Parent=transcript:SMAR013822-RA;Name=SMAR013822-RA-E2;assembly_name=Smar1;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;rank=2;version=1
 
-
-#### III. Files with predicted peptides in FASTA format. BITACORA requires identical IDs for proteins and their corresponding mRNAs or transcripts IDs in the GFF3. [NOTE: we recommend using genes but not isoforms in BITACORA; isoforms can be removed or properly annotated after BITACORA analysis]
+#### III. Files with predicted peptides in FASTA format. 
+BITACORA requires identical IDs for proteins and their corresponding mRNAs or transcripts IDs in the GFF3. [NOTE: we recommend using genes but not isoforms in BITACORA; isoforms can be removed or properly annotated after BITACORA analysis]
 
 #### IV. Specific folder with files containing the query protein databases (YOURFPDB_db.fasta) and HMM profiles (YOURFPDB_db.hmm) in FASTA and hmm format, respectively, where the “YOURFPDB” label is your specific data file name. The addition of ”_db” to the database name with its proper extension, fasta or hmm, is mandatory. 
 BITACORA requires one protein database and profile per surveyed gene family (or gene group). See Example/DB files for an example of searching for two different gene families in BITACORA: OR, Odorant Receptors; and CD36-SNMP.
@@ -104,8 +92,10 @@ http://pfam.xfam.org/family/PF03392#tabview=tab6
 
 In the case of searching for proteins with not described protein domains, or with domains not covering most of the protein sequence, it should be performed an alignment of the query proteins to construct a specific HMM profile. 
 Example of constructing a protein profile (it requires an aligner, here we use mafft as example):
+```
 $ mafft --auto FPDB_db.fasta > FPDB_db.aln
 $ hmmbuild FPDB_db.hmm FPDB_db.aln
+```
 
 Notes on the importance of selecting a confident curated database:
 The proteins included in the database to be used as query (FPDB) in the protein search is really important; indeed, the inclusion of unrelated or bad annotated proteins could lead to the identification and annotation of proteins unrelated to the focal gene family and can inflate the number of sequences identified.
@@ -143,15 +133,17 @@ Estimating the intron length distribution in your genome:
 MAXINTRON is a critical parameter affecting the quality of the gene models built after joining de novo identified exons after BLASTN search (see BITACORA article). BITACORA is distributed with a script (get_intron_size_fromgff.pl) to compute some summary statistics, such as the mean, median, and the 95% and 99% upper limits of the intron length distribution, of an input GFF, which can contain all genes from genome or only the genes identified for a particular gene family (i.e. GFF generated in BITACORA output). 
 Note that a very high value could join exons from different genes, generating a putative chimeric gene. On the other hand, a very low value could not join exons from the same gene. Therefore, it is very important to set a MAXINTRON biological realistic value, which could vary across species or assemblies. As default, BITACORA uses a conservative high value, as a compromise between ensuring the joining of all exons from a same gene, and avoiding the generation of erroneous gene fusions. In any case, a large value of MAXINTRON parameter prevents the annotation of fragmented genes but can generate gene models with multiple gene fusions. Putative gene fusions (proteins with two or more domains predicted by BITACORA) are tagged with the label “Xdom” at the end of the protein name in the output file, being X the number of putative genes (detected domains). 
 The number of putative fussed genes identified as new proteins in not annotated regions of the genome can be obtained using the following command in the terminal: 
+```
 $ grep '>.*dom' DB/DB_genomic_and_annotated_proteins_trimmed.fasta
-
+```
 
 
 ## 6. Running BITACORA
  
 After preparing the data as indicated in steps 5 (Usage) and 6 (Parameters), you can execute BITACORA with the following command:
+```
 $ bash runBITACORA.sh
-
+```
 
 ## 7. Output
 
@@ -206,8 +198,9 @@ Nonetheless, again, new proteins identified from unannotated genomic regions sho
 
 An example to run BITACORA can be found in Example folder. First, unzip the Example_files.zip file to obtain the necessary files for BITACORA. In this example, two chemosensory-related gene families in insects: Odorant receptors (ORs), and the CD36-SNMP gene family; will be searched in the chromosome 2R of Drosophila melanogaster. The GFF3 and protein files are modified from original annotations, deleting some gene models, to allow that BITACORA can identify novel not-annotated genes. 
 To run the example, edit the master script runBITACORA.sh to add the path to BLAST and HMMER binaries and run the script. It will take around 1 minute with 2 threads.
+```
 $ bash runBITACORA.sh
- 
+```
 
 ## 9. Citation
 
