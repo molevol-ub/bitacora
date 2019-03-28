@@ -1,5 +1,6 @@
-# BITACORA
+#BITACORA
 A comprehensive tool for the identification and annotation of gene families in genome assemblies
+
 
 Genome annotation is a critical bottleneck in genomic research, especially for the rigorous and comprehensive study of gene families. Despite current progress in automatic annotation, the tools developed for this task often generate absent or inaccurate gene models, such as fused or chimeric genes, which require an extra substantial effort to be correctly annotated. Here we present BITACORA, a bioinformatic tool that integrates sequence similarity search algorithms and Perl scripts to facilitate the curation of annotation errors, and the de novo identification of new family copies in genome sequences. The pipeline generates general feature format (GFF) files with both curated and novel gene models and FASTA files with the predicted peptides. The output of BITACORA can be easily integrated in genomic annotation editors, greatly facilitating subsequent semi-automatic annotation and downstream analyses.
 
@@ -69,14 +70,30 @@ BITACORA has been initially designed to work with genome sequences and protein a
 Preparing the data: The input files (in plain text) required by BITACORA to run a full analysis are (update the complete path to these files in the master script runBITACORA.sh):
 
 I. File with genomic sequences in FASTA format
+
 II. File with structural annotations in GFF3 format. [NOTE: mRNA or transcript, and CDS are mandatory fields]. 
+
 --------------------- GFF3 example
-
+lg1_ord1_scaf1770       AUGUSTUS        gene    13591   13902   0.57    +       .       ID=g1;
+lg1_ord1_scaf1770       AUGUSTUS        mRNA    13591   13902   0.57    +       .       ID=g1.t1;Parent=g1;
+lg1_ord1_scaf1770       AUGUSTUS        start_codon     13591   13593   .       +       0       Parent=g1.t1;
+lg1_ord1_scaf1770       AUGUSTUS        CDS     13591   13902   0.57    +       0       ID=g1.t1.CDS1;Parent=g1.t1
+lg1_ord1_scaf1770       AUGUSTUS        exon    13591   13902   .       +       .       ID=g1.t1.exon1;Parent=g1.t1;
+lg1_ord1_scaf1770       AUGUSTUS        stop_codon      13900   13902   .       +       0       Parent=g1.t1;
 ---------------------
+
 BITACORA also accepts other GFF formats, such as Ensembl GFF3 or GTF. [NOTE: GFF formatted files from NCBI can cause errors when processing the data, use the supplied script “reformat_ncbi_gff.pl” (located in the folder /Scripts/Tools) to make the file parsable by BITACORA]. See Troubleshooting in case of getting errors while parsing your GFF.
+
 --------------------- Ensembl GFF3 example
+AFFK01002511    EnsemblGenomes  gene    761     1018    .       -       .       ID=gene:SMAR013822;assembly_name=Smar1;b
+iotype=protein_coding;logic_name=ensemblgenomes;version=1
+AFFK01002511    EnsemblGenomes  transcript      761     1018    .       -       .       ID=transcript:SMAR013822-RA;Pare
+nt=gene:SMAR013822;assembly_name=Smar1;biotype=protein_coding;logic_name=ensemblgenomes;version=1
+AFFK01002511    EnsemblGenomes  CDS     761     811     .       -       0       Parent=transcript:SMAR013822-RA;assembly_name=Smar1
+AFFK01002511    EnsemblGenomes  exon    761     811     .       -       .       Parent=transcript:SMAR013822-RA;Name=SMAR013822-RA-E2;assembly_name=Smar1;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;rank=2;version=1
 
 ---------------------
+
 III. Files with predicted peptides in FASTA format. BITACORA requires identical IDs for proteins and their corresponding mRNAs or transcripts IDs in the GFF3. [NOTE: we recommend using genes but not isoforms in BITACORA; isoforms can be removed or properly annotated after BITACORA analysis]
 
 IV. Specific folder with files containing the query protein databases (YOURFPDB_db.fasta) and HMM profiles (YOURFPDB_db.hmm) in FASTA and hmm format, respectively, where the “YOURFPDB” label is your specific data file name. The addition of ”_db” to the database name with its proper extension, fasta or hmm, is mandatory. 
@@ -109,6 +126,7 @@ Under this mode, BITACORA identifies de novo all members of the surveyed family 
 ############
 5. Parameters 
 ############
+
 - The option CLEAN can be used to create the Intermediate_files directory where all intermediate files will be stored (see output section).
 CLEAN=T #T=true, F=false
 
