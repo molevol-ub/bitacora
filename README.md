@@ -6,36 +6,34 @@ A comprehensive tool for the identification and annotation of gene families in g
 Genome annotation is a critical bottleneck in genomic research, especially for the rigorous and comprehensive study of gene families. Despite current progress in automatic annotation, the tools developed for this task often generate absent or inaccurate gene models, such as fused or chimeric genes, which require an extra substantial effort to be correctly annotated. Here we present BITACORA, a bioinformatic tool that integrates sequence similarity search algorithms and Perl scripts to facilitate the curation of annotation errors, and the de novo identification of new family copies in genome sequences. The pipeline generates general feature format (GFF) files with both curated and novel gene models and FASTA files with the predicted peptides. The output of BITACORA can be easily integrated in genomic annotation editors, greatly facilitating subsequent semi-automatic annotation and downstream analyses.
 
 
-############
-0. Contents
-############
+## 0. Contents
 
-- 1. Installation
-- 2. Prerequisites
-- 3. Computational Requirements
-- 4. Usage modes
-	- 4.1 Full mode
-	- 4.2 Protein mode
-	- 4.3 Genome mode
-- 5. Parameters
-- 6. Running BITACORA
-- 7. Output
-- 8. Example
-- 9. Citation
-- 10. Troubleshooting
+ 1. Installation
+ 2. Prerequisites
+ 3. Computational Requirements
+ 4. Usage modes
+	 4.1 Full mode
+	 4.2 Protein mode
+	 4.3 Genome mode
+ 5. Parameters
+ 6. Running BITACORA
+ 7. Output
+ 8. Example
+ 9. Citation
+ 10. Troubleshooting
 
-############
-1. Installation
-############
+
+## 1. Installation
+
 
 BITACORA is distributed as a multiplatform shell script (runBITACORA.sh) that calls several other perl scripts, which include all functions responsible of performing all pipeline tasks. Hence, it does not require any installation or compilation step.
 You can download all package contents from GitHub: https://github.com/molevol-ub/bitacora or www.ub.edu/softevol/bitacora
 
 To run the pipeline edit the master script runBITACORA.sh variables described in Prerequisites, Data, and Parameters.
 
-############
-2. Prerequisites
-############
+
+## 2. Prerequisites
+
 
 - BLAST: Download blast executables from: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
 
@@ -54,38 +52,37 @@ HMMER and BLAST binaries require to be added to the PATH environment variable. S
 $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
 
-###########
-3. Computational requirements
-###########
+## 3. Computational requirements
+
 
 BITACORA have been tested in UNIX-based platforms (both in Mac OS and Linux operating systems). Multiple threading can be set in blast searches, which is the most time-consuming step, by editing the option THREADS in runBITACORA.sh 
 For a typical good quality genome (~2Gb in size and ~10,000 scaffolds) and a standard modern PC (16Gb RAM), a full run of BITACORA is completed in less than 24h. This running time, however, will depend on the size of the gene family or the group of genes surveyed in a particular analysis. For gene families of 10 to 100 members, BITACORA spends from minutes to a couple of hours. 
 In case of larger or very fragmented genomes, BITACORA should be used in a computer cluster or workstation given the increase of RAM memory and time required.
 
-############
-4. Usage modes
-############
 
-4.1. Full mode
+## 4. Usage modes
+
+### 4.1. Full mode
+
 BITACORA has been initially designed to work with genome sequences and protein annotations (full mode). However, the pipeline can also be used either with only protein or only genomic sequences (protein and genome modes, respectively). These last modes are explained in next subsections. 
 Preparing the data: The input files (in plain text) required by BITACORA to run a full analysis are (update the complete path to these files in the master script runBITACORA.sh):
 
-I. File with genomic sequences in FASTA format
+#### I. File with genomic sequences in FASTA format
 
-II. File with structural annotations in GFF3 format. [NOTE: mRNA or transcript, and CDS are mandatory fields]. 
+#### II. File with structural annotations in GFF3 format. [NOTE: mRNA or transcript, and CDS are mandatory fields]. 
 
---------------------- GFF3 example
+GFF3 example
 lg1_ord1_scaf1770       AUGUSTUS        gene    13591   13902   0.57    +       .       ID=g1;
 lg1_ord1_scaf1770       AUGUSTUS        mRNA    13591   13902   0.57    +       .       ID=g1.t1;Parent=g1;
 lg1_ord1_scaf1770       AUGUSTUS        start_codon     13591   13593   .       +       0       Parent=g1.t1;
 lg1_ord1_scaf1770       AUGUSTUS        CDS     13591   13902   0.57    +       0       ID=g1.t1.CDS1;Parent=g1.t1
 lg1_ord1_scaf1770       AUGUSTUS        exon    13591   13902   .       +       .       ID=g1.t1.exon1;Parent=g1.t1;
 lg1_ord1_scaf1770       AUGUSTUS        stop_codon      13900   13902   .       +       0       Parent=g1.t1;
----------------------
+
 
 BITACORA also accepts other GFF formats, such as Ensembl GFF3 or GTF. [NOTE: GFF formatted files from NCBI can cause errors when processing the data, use the supplied script “reformat_ncbi_gff.pl” (located in the folder /Scripts/Tools) to make the file parsable by BITACORA]. See Troubleshooting in case of getting errors while parsing your GFF.
 
---------------------- Ensembl GFF3 example
+Ensembl GFF3 example
 AFFK01002511    EnsemblGenomes  gene    761     1018    .       -       .       ID=gene:SMAR013822;assembly_name=Smar1;b
 iotype=protein_coding;logic_name=ensemblgenomes;version=1
 AFFK01002511    EnsemblGenomes  transcript      761     1018    .       -       .       ID=transcript:SMAR013822-RA;Pare
@@ -93,11 +90,10 @@ nt=gene:SMAR013822;assembly_name=Smar1;biotype=protein_coding;logic_name=ensembl
 AFFK01002511    EnsemblGenomes  CDS     761     811     .       -       0       Parent=transcript:SMAR013822-RA;assembly_name=Smar1
 AFFK01002511    EnsemblGenomes  exon    761     811     .       -       .       Parent=transcript:SMAR013822-RA;Name=SMAR013822-RA-E2;assembly_name=Smar1;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;rank=2;version=1
 
----------------------
 
-III. Files with predicted peptides in FASTA format. BITACORA requires identical IDs for proteins and their corresponding mRNAs or transcripts IDs in the GFF3. [NOTE: we recommend using genes but not isoforms in BITACORA; isoforms can be removed or properly annotated after BITACORA analysis]
+#### III. Files with predicted peptides in FASTA format. BITACORA requires identical IDs for proteins and their corresponding mRNAs or transcripts IDs in the GFF3. [NOTE: we recommend using genes but not isoforms in BITACORA; isoforms can be removed or properly annotated after BITACORA analysis]
 
-IV. Specific folder with files containing the query protein databases (YOURFPDB_db.fasta) and HMM profiles (YOURFPDB_db.hmm) in FASTA and hmm format, respectively, where the “YOURFPDB” label is your specific data file name. The addition of ”_db” to the database name with its proper extension, fasta or hmm, is mandatory. 
+#### IV. Specific folder with files containing the query protein databases (YOURFPDB_db.fasta) and HMM profiles (YOURFPDB_db.hmm) in FASTA and hmm format, respectively, where the “YOURFPDB” label is your specific data file name. The addition of ”_db” to the database name with its proper extension, fasta or hmm, is mandatory. 
 BITACORA requires one protein database and profile per surveyed gene family (or gene group). See Example/DB files for an example of searching for two different gene families in BITACORA: OR, Odorant Receptors; and CD36-SNMP.
 [NOTE: profiles covering only partially the proteins of interest are not recommended]
 
@@ -115,18 +111,18 @@ Notes on the importance of selecting a confident curated database:
 The proteins included in the database to be used as query (FPDB) in the protein search is really important; indeed, the inclusion of unrelated or bad annotated proteins could lead to the identification and annotation of proteins unrelated to the focal gene family and can inflate the number of sequences identified.
 On the other hand, if possible, we recommend to include proteins from phylogenetically-close species to increase the power of identifying proteins, particularly in fast-evolving and divergent gene families. If your organism of interest does not have an annotated genome of a close related species, we suggest to perform a second BITACORA round (step 3 described in the manuscript), including in the query database (sFPDB) the sequences identified in the first round, along with a new HMM profile build with these sequences. This step may facilitate the identification of previously undetected related divergent sequences.
 
-4.2. Protein mode
+### 4.2. Protein mode
 BITACORA can also run with a set of proteins (i.e. predicted peptides from transcriptomic data; script runBITACORA_protein_mode.sh) by using the input files described in points III and IV of the section 4.1.
 Under this mode, BITACORA identifies, curates when necessary, and report all members of the surveyed family among the predicted peptides. The original peptide sequences (not being curated) are also reported (located in Intermediate_Files if cleaning output is active).
 
-4.3. Genome mode
+### 4.3. Genome mode
 BITACORA can also run with raw genome sequences (i.e., not annotated genomes; script runBITACORA_genome_mode.sh), by using the input files described in points I and IV of the section 4.1.
 Under this mode, BITACORA identifies de novo all members of the surveyed family and returns a BED file with gene coordinates of the detected exons, a FASTA file with predicted peptides from these exons and a GFF3 file with the corresponding structural annotations. 
-[NOTE: The gene models generated under this mode are only semi-automatic predictions and require further manual annotation, i.e. using genomic annotation editors, such as Apollo. The output file of the genome mode can also be used as protein evidence in automatic annotators as MAKER2 or BRAKER1 (see output section) (CITAS)]
+[NOTE: The gene models generated under this mode are only semi-automatic predictions and require further manual annotation, i.e. using genomic annotation editors, such as Apollo. The output file of the genome mode can also be used as protein evidence in automatic annotators as MAKER2 or BRAKER1 (see output section)]
 
-############
-5. Parameters 
-############
+
+## 5. Parameters 
+
 
 - The option CLEAN can be used to create the Intermediate_files directory where all intermediate files will be stored (see output section).
 CLEAN=T #T=true, F=false
@@ -150,15 +146,15 @@ The number of putative fussed genes identified as new proteins in not annotated 
 $ grep '>.*dom' DB/DB_genomic_and_annotated_proteins_trimmed.fasta
 
 
-############
-6. Running BITACORA
-############ 
+
+## 6. Running BITACORA
+ 
 After preparing the data as indicated in steps 5 (Usage) and 6 (Parameters), you can execute BITACORA with the following command:
 $ bash runBITACORA.sh
 
-############
-7. Output
-############
+
+## 7. Output
+
 BITACORA creates an output folder for each query database, and three files with the number of proteins identified in each step, including a summary table. For the genome and protein modes, only one summary table will be reported with the number of identified genes. 
 In each folder, there are the following main files (considering you chose to clean output directory. If not, all files will be found in the same output folder): 
 - YOURFPDB_genomic_and_annotated_genes_trimmed.gff3: GFF3 file with information of all identified protein curated models both in already annotated proteins and unannotated genomic sequences.
@@ -180,7 +176,6 @@ In addition, BITACORA generates the following Intermediate files (located into I
 	- YOURFPDB_genomic_genes_trimmed.gff3: GFF3 containing new identified proteins in genomic sequences curated by the positions identified in the HMM profile.
 	- YOURFPDBgfftrimmed.cds.fasta and YOURFPDBgfftrimmed.pepfasta: Files containing CDS and protein sequences translated directly from YOURFPDB_annot_genes_trimmed.gff3
 	- YOURFPDBgffgenomictrimmed.cds.fasta and YOURFPDBgffgenomictrimmed.pep.fasta: Files containing CDS and protein sequences translated directly from YOURFPDB_genomic_genes_trimmed.gff3
-
 	- hmmer folder containing the output of HMMER searches against the annotated proteins a new proteins identified in the genome
 	- YOURFPDB_blastp.outfmt6: BLASTP output of the search of the query DB against the annotated peptides
 	- YOURFPDB_tblastn.outfmt6: TBLASTN output of the search of the query query DB against the genomic sequence
@@ -205,18 +200,17 @@ If sequences contain stop codons, codified as “X”, it could be artifactual f
 Nonetheless, again, new proteins identified from unannotated genomic regions should be properly annotated using genome browser annotation tools such as Apollo, or could be used as evidence to improve the annotation of automatic annotators as MAKER2 or BRAKER1. We estimate an approximate number of them which could be used for prospective analyses.
 
 
-############
-8. Example
-############
+
+## 8. Example
+
 
 An example to run BITACORA can be found in Example folder. First, unzip the Example_files.zip file to obtain the necessary files for BITACORA. In this example, two chemosensory-related gene families in insects: Odorant receptors (ORs), and the CD36-SNMP gene family; will be searched in the chromosome 2R of Drosophila melanogaster. The GFF3 and protein files are modified from original annotations, deleting some gene models, to allow that BITACORA can identify novel not-annotated genes. 
 To run the example, edit the master script runBITACORA.sh to add the path to BLAST and HMMER binaries and run the script. It will take around 1 minute with 2 threads.
 $ bash runBITACORA.sh
  
 
-############
-9. Citation
-############
+## 9. Citation
+
 
 Joel Vizueta, Alejandro Sánchez-Gracia, and Julio Rozas (2019): BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. Submitted.
 
@@ -224,9 +218,8 @@ Moreover, you can also cite the following article where we describe the protein 
 Joel Vizueta, Julio Rozas, Alejandro Sánchez-Gracia; Comparative Genomics Reveals Thousands of Novel Chemosensory Genes and Massive Changes in Chemoreceptor Repertories across Chelicerates, Genome Biology and Evolution, Volume 10, Issue 5, 1 May 2018, Pages 1221–1236, https://doi.org/10.1093/gbe/evy081
 
 
-############
-10. Troubleshooting
-############
+## 10. Troubleshooting
+
 
 When BITACORA detects any error related to input data, it stops and prints the description of the error. Please check the error and your data.
 If you are getting errors related to parsing the GFF file, take into account that BITACORA expects proteins ID to be as ID in mRNA rows from GFF3. 
