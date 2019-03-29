@@ -70,6 +70,7 @@ In case of larger or very fragmented genomes, BITACORA should be used in a compu
 ### 4.1. Full mode
 
 BITACORA has been initially designed to work with genome sequences and protein annotations (full mode). However, the pipeline can also be used either with only protein or only genomic sequences (protein and genome modes, respectively). These last modes are explained in next subsections. 
+
 Preparing the data: The input files (in plain text) required by BITACORA to run a full analysis are (update the complete path to these files in the master script runBITACORA.sh):
 
 #### I. File with genomic sequences in FASTA format
