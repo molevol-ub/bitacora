@@ -92,7 +92,7 @@ BITACORA also accepts other GFF formats, such as Ensembl GFF3 or GTF.
 
 [NOTE: GFF formatted files from NCBI can cause errors when processing the data, use the supplied script “reformat_ncbi_gff.pl” (located in the folder /Scripts/Tools) to make the file parsable by BITACORA]. See Troubleshooting in case of getting errors while parsing your GFF.
 
-GEnsembl FF3 example
+Ensembl FF3 example
 ```
 AFFK01002511    EnsemblGenomes  gene    761     1018    .       -       .       ID=gene:SMAR013822;assembly_name=Smar1;biotype=protein_coding;logic_name=ensemblgenomes;version=1
 AFFK01002511    EnsemblGenomes  transcript      761     1018    .       -       .       ID=transcript:SMAR013822-RA;Parent=gene:SMAR013822;assembly_name=Smar1;biotype=protein_coding;logic_name=ensemblgenomes;version=1
@@ -117,8 +117,8 @@ HMM profiles are found in InterPro or PFAM databases associated to known protein
 For example, for the chemosensory proteins (CSPs) in insects, you can download the HMM profile from pfam (Curation & model PFAM submenu):
 http://pfam.xfam.org/family/PF03392#tabview=tab6
 
-In the case of searching for proteins with not described protein domains, or with domains not covering most of the protein sequence, it should be performed an alignment of the query proteins to construct a specific HMM profile. 
-Example of constructing a protein profile (it requires an aligner, here we use mafft as example):
+In the case of searching for proteins with not described protein domains, or with domains not covering most of the protein sequence, it should be performed an alignment of the query proteins to create a specific HMM profile. 
+Example of building a protein profile (it requires an aligner, here we use mafft as example):
 ```
 $ mafft --auto FPDB_db.fasta > FPDB_db.aln
 $ hmmbuild FPDB_db.hmm FPDB_db.aln
@@ -201,19 +201,19 @@ BED files with non-redundant merged blast hits in genome sequence:
 In addition, BITACORA generates the following Intermediate files (located into Intermediate_files folder created in cleaning, if active)
 
 	- YOURFPDB_annot_genes.gff3 and YOURFPDB_proteins.fasta: GFF3 and fasta file containing the original untrimmed models for the identified proteins.
-	- YOURFPDB_annot_genes_trimmed.gff3 and YOURFPDB_proteins_trimmed.fasta: GFF3 and fasta containing only the curated model for the identified annotated proteins (trimming exons if not aligned to query db sequences or split putative fused genes)
-	- YOURFPDB_genomic_genes.gff3: GFF3 containing new identified proteins in genomic sequences. 
-	- YOURFPDB_genomic_genes_trimmed.gff3: GFF3 containing new identified proteins in genomic sequences curated by the positions identified in the HMM profile.
+	- YOURFPDB_annot_genes_trimmed.gff3 and YOURFPDB_proteins_trimmed.fasta: GFF3 and fasta containing only the curated model for the identified annotated proteins (trimming exons if not aligned to query FPDB sequences or split putative fused genes)
+	- YOURFPDB_genomic_genes.gff3: GFF3 containing novel identified proteins in genomic sequences. 
+	- YOURFPDB_genomic_genes_trimmed.gff3: GFF3 containing novel identified proteins in genomic sequences curated by the positions identified in the HMM profile.
 	- YOURFPDBgfftrimmed.cds.fasta and YOURFPDBgfftrimmed.pepfasta: Files containing CDS and protein sequences translated directly from YOURFPDB_annot_genes_trimmed.gff3
 	- YOURFPDBgffgenomictrimmed.cds.fasta and YOURFPDBgffgenomictrimmed.pep.fasta: Files containing CDS and protein sequences translated directly from YOURFPDB_genomic_genes_trimmed.gff3
-	- hmmer folder containing the output of HMMER searches against the annotated proteins a new proteins identified in the genome
-	- YOURFPDB_blastp.outfmt6: BLASTP output of the search of the query DB against the annotated peptides
-	- YOURFPDB_tblastn.outfmt6: TBLASTN output of the search of the query query DB against the genomic sequence
-	- YOURFPDB_blastp_parsed_list.txt; X_hmmer_parsed_list.txt; X_allsearches_list.txt; X_combinedsearches_list.txt: Parsed files combining all hits and extending the hit positions from blastp and hmmer outputs
-	- YOURFPDB_tblastn_parsed_list_genomic_positions.txt (and _notgff_filtered): File containing the positions identified after parsing the tBLASTn search. 
+	- hmmer folder containing the output of HMMER searches against the annotated proteins and novel proteins identified in the genome
+	- YOURFPDB_blastp.outfmt6: BLASTP output of the search of the query FPDB against the annotated peptides
+	- YOURFPDB_tblastn.outfmt6: TBLASTN output of the search of the query FPDB against the genomic sequence
+	- YOURFPDB_blastp_parsed_list.txt; YOURFPDB_hmmer_parsed_list.txt; YOURFPDB_allsearches_list.txt; YOURFPDB_combinedsearches_list.txt: Parsed files combining all hits and extending the hit positions from BLASTP and HMMER outputs
+	- YOURFPDB_tblastn_parsed_list_genomic_positions.txt and _nogff_filtered: File containing the positions identified after parsing the tBLASTn search. 
 	- YOURFPDB_prots_VsGFF_badannot_list.txt and _goodannot_list.txt: Debugging files: These files are for checking that the identified proteins and the protein models in the GFF3 codify the same protein. If the file badannot_list.txt contains some identifier, it means that the GFF3 annotation is incorrect pointing to a bad annotation in the original GFF3. Please, try to translate the CDS for that protein into the 3 reading frames and check if the 2nd or 3rd frame codify for the protein in question stored in "YOURFPDB_genomic_and_annotated_proteins_trimmed_nr.fasta". If correct, modify the GFF3 by adding 1 or 2 nucleotide position in the start of the GFF3 (take into account if it is transcribed from forward or reverse strand). If negative, please report the error via GitHub.
-	- YOURFPDB_genomic_genes_proteins.fasta: It contains all merged exons from putative new proteins identified in the genome before filtering those without the protein domain identified with HMMER. This file could be useful in case of using an HMM profile not trained with your sequences which cannot detect some sequences.
-	- YOURFPDB_genomic_exon_proteins.fasta: contains the exons sequences joined into genes in the aforementioned file.
+	- YOURFPDB_genomic_genes_proteins.fasta: It contains all merged exons from putative novel proteins identified in the genome before filtering those without the protein domain identified with HMMER. This file could be useful in case of using an HMM profile not trained with your sequences which cannot detect some sequences.
+	- YOURFPDB_genomic_exon_proteins.fasta: contains the exon sequences joined into genes in the aforementioned file.
 	- Additional generated files are stored for pipeline debugging and controls.
 
 
@@ -221,7 +221,7 @@ In addition, BITACORA generates the following Intermediate files (located into I
 
 The obtained proteins could be used for further prospective analyses or to facilitate a more curated annotation using genome annotation editors or, in the case of having a high number of not annotated proteins in the GFF, BITACORA output sequences could also be used as evidence to improve the annotation of automatic annotators as MAKER2 or BRAKER1. However, a first validation of the obtained proteins should be performed, more specifically in those obtained newly from genome (taking into account the parameter used to join putative exons, to split putative joined genes or join exons from the same gene). In addition, these proteins obtained and assembled from genomic regions are illustrative, but more putative genes (true negatives) could be obtained from the TBLASTN BED file positions discarded for not being identified with the protein domain (i.e. alignments containing introns between two proximal exons could lead not to identify the domain in the protein).
 
-Such validation to identify putative erroneously assigned proteins (mainly caused by the inclusion of contaminant sequences in the query database) could consist in aligning all proteins and checking the MSA, constructing the phylogeny of the gene with related species or the gene family; doing a reduced blast with nr or obtaining structural particularities of the proteins (i.e. characterizing protein domains as transmembrane domains, signal peptides...). See our manuscript Vizueta et al. (2018) for an example of such analyses.
+Such validation to identify putative erroneously assigned proteins (mainly caused by the inclusion of contaminant sequences in the query database) could consist in aligning all proteins and checking the MSA, constructing the phylogeny of the gene with related species or the gene family; doing a reduced blast with NCBI-nr database or obtaining structural particularities of the proteins (i.e. characterizing protein domains as transmembrane domains, signal peptides...). See our manuscript Vizueta et al. (2018) for an example of such analyses.
 
 In particular, BITACORA full and genome mode is also designed to facilitate the gene annotation in editors as Apollo. For that, the use of the following files would be useful (see an example in Documentation/example_Apollo.png):
 
