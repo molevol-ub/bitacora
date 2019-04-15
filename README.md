@@ -192,7 +192,7 @@ In each folder, there are the following main files (considering you chose to cle
 
 Non-redundant data: Relevant information excluding identical proteins, or those considered as artifactual false positives (i.e. duplicated scaffolds, isoforms…).
 - YOURFPDB_genomic_and_annotated_genes_trimmed_nr.gff3: GFF3 file containing all identified non-redundant protein curated models both in already annotated proteins and unannotated genomic sequences.
-- YOURFPDB_genomic_and_annotated_proteins_trimmed.fasta: A fasta file containing the non-redundant protein sequences from the above gene models.
+- YOURFPDB_genomic_and_annotated_proteins_trimmed_nr.fasta: A fasta file containing the non-redundant protein sequences from the above gene models.
 
 BED files with non-redundant merged blast hits in genome sequence:
 - YOURFPDBtblastn_parsed_list_genomic_positions.bed: BED file with only merged blast alignments in non-annotated regions.
