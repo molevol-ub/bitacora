@@ -139,7 +139,10 @@ foreach my $gene (@genes){
 		if (exists $protid{$gene}){
 			$geneid = $protid{$gene};
 			next if ($geneid =~ /none/);
-		} else {die "ERROR in reformat_ncbi_gff.pl: a protein ID cannot be found for gene $gene\n";}
+		} else {
+			print "ERROR in reformat_ncbi_gff.pl: a protein ID cannot be found for gene $gene   Please exclude this gene from GFF\n";
+			next;
+		}
 
 		if ($keep =~ /$geneid  /){
 			$dups++;
@@ -168,13 +171,30 @@ foreach my $gene (@genes){
 			@posorder = sort { $b <=> $a } @positions;
 		} else {die "ERROR in reformat_ncbi_gff.pl: No forward/reverse in $gffgene{$gene}\n";}
 
+		my $firstcds = 1;
 		foreach my $posit (@posorder){
+			my $cdsnum = @{$gffcds{$gene}{$posit}};
 			foreach my $cds (@{$gffcds{$gene}{$posit}}) {
 				my @subl3 = split (/\t/, $cds);
 				if ($subl3[8] =~ /Parent=[^;]+;(.*)/){
 					my $rest2 = $1;
+					my $chain = $subl3[6];
 
-					print Results "$subl3[0]\t$subl3[1]\t$subl3[2]\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$geneid\.CDS$n;Parent=$geneid;$rest2\n";		
+					if ($chain =~ /\+/ && $firstcds == 1){
+						my $newpos1 = $subl3[3] + $subl3[7];
+						print Results "$subl3[0]\t$subl3[1]\t$subl3[2]\t$newpos1\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$geneid\.CDS$n;Parent=$geneid;$rest2\n";	
+					} 
+
+					elsif ($chain =~ /\-/ && $firstcds == 1){
+						my $newpos1 = $subl3[4] - $subl3[7];
+						print Results "$subl3[0]\t$subl3[1]\t$subl3[2]\t$subl3[3]\t$newpos1\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$geneid\.CDS$n;Parent=$geneid;$rest2\n";	
+					} 
+
+					else {
+						print Results "$subl3[0]\t$subl3[1]\t$subl3[2]\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$geneid\.CDS$n;Parent=$geneid;$rest2\n";		
+					}
+					
+					$firstcds++;
 					$n++;
 				}
 				else {die "ERROR in reformat_ncbi_gff.pl: No Parent ID found in $cds\n$subl3[8]\n";}
