@@ -100,7 +100,7 @@ AFFK01002511    EnsemblGenomes  CDS     761     811     .       -       0       
 AFFK01002511    EnsemblGenomes  exon    761     811     .       -       .       Parent=transcript:SMAR013822-RA;Name=SMAR013822-RA-E2;assembly_name=Smar1;constitutive=1;ensembl_end_phase=0;ensembl_phase=0;rank=2;version=1
 ```
 
-#### III. Files with predicted peptides in FASTA format. 
+#### III. Files with predicted proteins in FASTA format. 
 BITACORA requires identical IDs for proteins and their corresponding mRNAs or transcripts IDs in the GFF3. 
 
 [NOTE: we recommend using genes but not isoforms in BITACORA; isoforms can be removed or properly annotated after BITACORA analysis]
@@ -132,15 +132,15 @@ On the other hand, if possible, we recommend to include proteins from phylogenet
 
 ### 4.2. Protein mode
 
-BITACORA can also run with a set of proteins (i.e. predicted peptides from transcriptomic data; script runBITACORA_protein_mode.sh) by using the input files described in points III and IV of the section 4.1.
+BITACORA can also run with a set of proteins (i.e. predicted proteins from transcriptomic data; script runBITACORA_protein_mode.sh) by using the input files described in points III and IV of the section 4.1.
 
-Under this mode, BITACORA identifies, curates when necessary, and report all members of the surveyed family among the predicted peptides. The original peptide sequences (not being curated) are also reported (located in Intermediate_Files if cleaning output is active).
+Under this mode, BITACORA identifies, curates when necessary, and report all members of the surveyed family among the predicted proteins. The original protein sequences (not being curated) are also reported (located in Intermediate_Files if cleaning output is active).
 
 ### 4.3. Genome mode
 
 BITACORA can also run with raw genome sequences (i.e., not annotated genomes; script runBITACORA_genome_mode.sh), by using the input files described in points I and IV of the section 4.1.
 
-Under this mode, BITACORA identifies de novo all members of the surveyed family and returns a BED file with gene coordinates of the detected exons, a FASTA file with predicted peptides from these exons and a GFF3 file with the corresponding structural annotations. 
+Under this mode, BITACORA identifies de novo all members of the surveyed family and returns a BED file with gene coordinates of the detected exons, a FASTA file with predicted proteins from these exons and a GFF3 file with the corresponding structural annotations. 
 
 [NOTE: The gene models generated under this mode are only semi-automatic predictions and require further manual annotation, i.e. using genomic annotation editors, such as Apollo. The output file of the genome mode can also be used as protein evidence in automatic annotators as MAKER2 or BRAKER1 (see output section)]
 
@@ -208,7 +208,7 @@ In addition, BITACORA generates the following Intermediate files (located into I
 	- YOURFPDBgfftrimmed.cds.fasta and YOURFPDBgfftrimmed.pepfasta: Files containing CDS and protein sequences translated directly from YOURFPDB_annot_genes_trimmed.gff3
 	- YOURFPDBgffgenomictrimmed.cds.fasta and YOURFPDBgffgenomictrimmed.pep.fasta: Files containing CDS and protein sequences translated directly from YOURFPDB_genomic_genes_trimmed.gff3
 	- hmmer folder containing the output of HMMER searches against the annotated proteins and novel proteins identified in the genome
-	- YOURFPDB_blastp.outfmt6: BLASTP output of the search of the query FPDB against the annotated peptides
+	- YOURFPDB_blastp.outfmt6: BLASTP output of the search of the query FPDB against the annotated proteins
 	- YOURFPDB_tblastn.outfmt6: TBLASTN output of the search of the query FPDB against the genomic sequence
 	- YOURFPDB_blastp_parsed_list.txt; YOURFPDB_hmmer_parsed_list.txt; YOURFPDB_allsearches_list.txt; YOURFPDB_combinedsearches_list.txt: Parsed files combining all hits and extending the hit positions from BLASTP and HMMER outputs
 	- YOURFPDB_tblastn_parsed_list_genomic_positions.txt and _nogff_filtered: File containing the positions identified after parsing the tBLASTn search. 
