@@ -251,7 +251,7 @@ $ bash runBITACORA.sh
 ## 9. Citation
 
 
-Joel Vizueta, Alejandro Sánchez-Gracia, and Julio Rozas (2019): BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. Submitted.
+Joel Vizueta, Alejandro Sánchez-Gracia, and Julio Rozas (2019): BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. bioRxiv. https://doi.org/10.1101/593889
 
 Moreover, you can also cite the following article where we describe the protein annotation procedure:
 
