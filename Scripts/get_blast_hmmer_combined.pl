@@ -4,6 +4,7 @@ use warnings;
 
 # Usage: 	perl Scripts/get_blast_hmmer_combined.pl outname\_allsearches_list.txt outname
 
+my %mdom;
 
 open (File, "<", $ARGV[0]);
 my %genes;
@@ -18,6 +19,11 @@ while (<File>){
 		$gene = $subline[0];
 	}
 	push (@{$genes{$gene}}, $line);
+
+	if ($subline[4] =~ /hmmer/){
+		$mdom{$gene} = $subline[5];
+	}
+
 }
 close File;
 open (Results, ">", "$ARGV[1]\_combinedsearches_list.txt");
@@ -74,14 +80,27 @@ foreach my $gene (sort keys %genes){
 
 	my $hits = scalar(@ini);
 	if ($hits == 1){
-		print Results "$gene $fragcomp $ini[0] $fin[0] $method\n";
+		if ($method =~ /hmmer/){
+			print Results "$gene $fragcomp $ini[0] $fin[0] $method $mdom{$gene}\n";
+		} else {
+			print Results "$gene $fragcomp $ini[0] $fin[0] $method 0\n";
+		}	
 	}
 	else {
 		my $n = 0;
 		foreach my $i (@ini){
 			my $f = $fin[$n];
 			my $nn = $n+1;
-			print Results "$gene\_split$nn $fragcomp $ini[$n] $fin[$n] $method\n";
+			if ($method =~ /hmmer/){
+				my $numsplit = scalar (@ini);
+				if ($numsplit >= $mdom{$gene}){
+					print Results "$gene\_split$nn $fragcomp $ini[$n] $fin[$n] $method 1\n";
+				} else {
+					print Results "$gene\_split$nn $fragcomp $ini[$n] $fin[$n] $method $mdom{$gene}\n";
+				}
+			} else {
+				print Results "$gene\_split$nn $fragcomp $ini[$n] $fin[$n] $method 0\n";
+			}				
 			$n++;
 		}
 	}

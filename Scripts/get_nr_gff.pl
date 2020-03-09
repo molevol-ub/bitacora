@@ -54,7 +54,7 @@ while (<Fasta>) {
 close Fasta;
 
 
-open (Results, ">", "$ARGV[3]\_genomic_and_annotated_genes_nr.gff3");
+open (Results, ">", "$ARGV[3]");
 
 open (GFFfile , "<", $ARGV[1]); 
 while (<GFFfile>) {
@@ -118,7 +118,7 @@ while (<GFFfile>) {
 			$genename = $1;
 		} 
 
-		if ($nrgeneids =~ /$genename\__/){
+		if ($nrgeneids =~ /$genename\__/ || $nrgeneids =~ /$genename/ ){
 			print Results "$line\n";
 		}
 
@@ -188,7 +188,7 @@ while (<GFFfile>) {
 			$genename = $1;
 		} 
 
-		if ($nrgeneids =~ /$genename\__/){
+		if ($nrgeneids =~ /$genename\__/ || $nrgeneids =~ /$genename/ ){
 			print Results "$line\n";
 		}
 

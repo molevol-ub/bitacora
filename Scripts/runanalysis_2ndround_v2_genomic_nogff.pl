@@ -7,6 +7,7 @@ my $dirname = dirname(__FILE__);
 #####
 #
 # Run second analysis, identifying new proteins in the genome
+# V2 - New proteins are identified using blast and hmmer (as in step 1)
 #
 #####
 
@@ -128,13 +129,39 @@ foreach my $chem (@chemosensory){
 	system ("perl $dirname/get_genomic_fasta_frameseqs_fromalist.pl $translation $chem/$chem"."tblastn_parsed_list_nogff_filtered.txt $chem/$chem");
 	system ("perl $dirname/get_genomic_genes_from_exons.pl $chem/$chem"."tblastn_parsed_list_nogff_filtered.txt $chem/$chem\_genomic_exon_proteins.fasta $chem/$chem $maxintron");
 
-	# Filtering putative erroneus proteins with HMMER
-
-	print "Doing $chem hmmer in newly identified genomic genes\n";
+	# Filtering putative erroneus proteins (blastp and hmmer)
+	# run blastp
+	print "Doing $chem blastp and hmmer in newly identified genomic genes\n";
+	system ("makeblastdb -in $chem/$chem\_genomic_genes_proteins.fasta -dbtype prot >/dev/null 2>/dev/null");
+	system ("blastp -query $chemdir\/$chem\_db\.fasta -db $chem/$chem\_genomic_genes_proteins.fasta -out $chem\/$name\_Vs$chem\_genomic_blastp\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std qlen slen\" ");
+	# run hmmer
 	system ("hmmsearch -o $chem\/hmmer\/$name\_genomic_genes\_$chem\.out --notextw --tblout $chem\/hmmer\/$name\_genomic_genes_$chem\.tblout --domtblout $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chemdir\/$chem\_db\.hmm $chem/$chem\_genomic_genes_proteins.fasta");
-	system ("perl $dirname/get_genomic_hmmer_parsed.pl $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chem/$chem\_genomic_genes $evalue");
-	system ("perl $dirname/get_fasta_fromalist.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed");
-	system ("perl $dirname/get_genomic_fasta_trimmed.pl $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed");
+
+
+	# Parsing blast and hmmer outputs
+
+	system ("perl $dirname/get_blastp_parsed_newv2.pl $chem\/$name\_Vs$chem\_genomic_blastp\.outfmt6 $chem/$chem\_genomic_genes $evalue");
+	system ("perl $dirname/get_hmmer_parsed_newv.pl $chem\/hmmer\/$name\_genomic_genes_$chem\.domtblout $chem/$chem\_genomic_genes $evalue");
+	
+	# Combining results from blast and hmmer
+
+	system ("cat $chem/$chem\_genomic_genes"."blastp_parsed_list.txt $chem/$chem\_genomic_genes"."hmmer_parsed_list.txt > $chem/$chem\_genomic_genes\_allsearches_list.txt");
+	system ("perl $dirname/get_blast_hmmer_combined.pl $chem/$chem\_genomic_genes_allsearches_list.txt $chem/$chem\_genomic_genes");
+
+	# Obtaining raw original and trimming protein sequences
+
+	system ("perl $dirname/get_fasta_fromalist_v2.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem\_genomic\_genes_hmmerparsed"); 
+	system ("perl $dirname/get_genomic_fasta_trimmed.pl $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed"); 
+
+	# Generating a GFF3 for the identified and reannotated (trimmed) proteins
+
+	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
+	system ("perl $dirname/get_annot_genomic_genes_gff_v2.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
+
+	# Validating the obtained GFF3
+
+	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem"."gffgenomictrimmed.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
+	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 
 	open (File, "<", "$chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta");
@@ -209,21 +236,8 @@ foreach my $chem (@chemosensory){
 	foreach my $kseq (sort keys %nrfa){
 		print NRfasta ">$kseq\n$nrfa{$kseq}\n";
 	}
-	close NRfasta;
-	
 
 	print Chemcounts"$chem\t$genomic_count\t$totalnrseqs\n";
-
-
-	## Generating a GFF for genomic genes
-
-	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
-
-	# Validating the obtained GFF3
-
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem"."gffgenomictrimmed.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 
 	# Creating a final GFF for all annotations

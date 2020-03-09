@@ -19,6 +19,7 @@ my $translation = "$ARGV[2].frame";
 my $evalue = $ARGV[3];
 my $maxintron = $ARGV[4];
 my $threads = $ARGV[5];
+my $gemomap = $ARGV[6];
 
 ## Start
 
@@ -88,16 +89,21 @@ foreach my $chem (@chemosensory){
 	system ("mkdir -p $chem");
 	system ("mkdir -p $chem\/hmmer");
 
+	# Filter db to avoid including the same sequence more than once
+	system ("cp $chemdir\/$chem\_db.fasta $chem\/$chem\_db.fasta");
+	system ("perl $dirname/get_fasta_uniqueseq.pl $chem\/$chem\_db.fasta $chem\/$chem\_db_filt.fasta");
+
 	# run tblastn
 	print "Doing $chem tblastn\n";
-	system ("tblastn -query $chemdir\/$chem\_db.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads");
+	#system ("tblastn -version");
+	system ("tblastn -query $chem\/$chem\_db_filt.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sallseqid score nident positive gaps ppos qframe sframe qseq sseq qlen slen salltitles\" -evalue $evalue -num_threads $threads");
+
 
 	# Parsing tblastn output
 	print "Parsing $chem tblastn\n";
 
 	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
-	system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
-
+	system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
 
 	###### Exiting if no novel genes are found
 
@@ -123,10 +129,78 @@ foreach my $chem (@chemosensory){
 	#######
 
 	### Script continues
-	# Obtaining protein sequences, exons and genes
 
-	system ("perl $dirname/get_genomic_fasta_frameseqs_fromalist.pl $translation $chem/$chem"."tblastn_parsed_list_nogff_filtered.txt $chem/$chem");
-	system ("perl $dirname/get_genomic_genes_from_exons.pl $chem/$chem"."tblastn_parsed_list_nogff_filtered.txt $chem/$chem\_genomic_exon_proteins.fasta $chem/$chem $maxintron");
+	## Predicting new genes using GeMoMa
+	print "Using GeMoMa to predict novel genes\n";
+
+	system ("mkdir -p $chem/gemoma_outdir");
+	system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6 t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
+
+	# Check if GeMoMa finished without errors
+	my $gemoerr = "0";
+	open (FileGemo, "<", "$chem\/gemoma.err");
+	while (<FileGemo>){
+		chomp;
+		my $gemline = $_;
+		next if ($gemline !~ /\S+/);
+		if ($gemline =~ /Exception/){
+			$gemoerr++;
+		}
+
+	}
+	close FileGemo;
+	if ($gemoerr > 0){
+		die "ERROR in $dirname/runanalysis_2ndroung_genomic_withgff_gemoma: GeMoMa died with error running GeMoMa\n";
+	}
+
+	## Filtering annotations
+
+	system ("java -jar $gemomap CLI GAF g=$chem\/gemoma_outdir/predicted_annotation.gff outdir=$chem/gemoma_outdir f= > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	
+	# Check if GeMoMa finished without errors
+	$gemoerr = "0";
+	open (FileGemo, "<", "$chem\/gemoma.err");
+	while (<FileGemo>){
+		chomp;
+		my $gemline = $_;
+		next if ($gemline !~ /\S+/);
+		if ($gemline =~ /Exception/){
+			$gemoerr++;
+		}
+
+	}
+	close FileGemo;
+	if ($gemoerr > 0){
+		die "ERROR in $dirname/runanalysis_2ndroung_genomic_withgff_gemoma: GeMoMa died with error runnning GAF\n";
+	}
+
+
+	system ("java -jar $gemomap CLI AnnotationFinalizer a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	
+	# Check if GeMoMa finished without errors
+	$gemoerr = "0";
+	open (FileGemo, "<", "$chem\/gemoma.err");
+	while (<FileGemo>){
+		chomp;
+		my $gemline = $_;
+		next if ($gemline !~ /\S+/);
+		if ($gemline =~ /Exception/){
+			$gemoerr++;
+		}
+
+	}
+	close FileGemo;
+	if ($gemoerr > 0){
+		die "ERROR in $dirname/runanalysis_2ndroung_genomic_withgff_gemoma: GeMoMa died with error running AF\n";
+	}
+
+
+	## Extract novel annotated genes only and rename GFF
+
+	system ("perl $dirname/get_gemoma_gff_genomemode.pl $chem\/gemoma_outdir/filtered_predictions.gff $chem\/gemoma_outdir/$chem $chem $genome");
+	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes.gff3 $chem/$chem\_genomic_genes.gff3");
+	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes.pep.fasta $chem/$chem\_genomic_genes_proteins.fasta");
+
 
 	# Filtering putative erroneus proteins with HMMER
 
@@ -217,8 +291,8 @@ foreach my $chem (@chemosensory){
 
 	## Generating a GFF for genomic genes
 
-	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
+	#system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
+	system ("perl $dirname/get_gemoma_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 

@@ -13,20 +13,20 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.0
+VERSION=1.1
 
 ##########################################################
 ##    		   EXPORT EXECUTABLES TO PATH 				##
 ##########################################################
 
-# Perl needs to be installed. 
+# Perl needs to be installed in the system
 # HMMER and BLAST executables need to be included in $PATH
 
 export PATH=$PATH:/path/to/blast/bin
 export PATH=$PATH:/path/to/hmmer/bin
 
-# PATH to BITACORA Scripts folder. 
-SCRIPTDIR=../Scripts
+# (Optional) In case of using GeMoMa, specify the PATH to jar file
+GEMOMAP=/path/to/GeMoMa.jar
 
 ##########################################################
 ##                  PREPARE THE DATA 					##
@@ -59,14 +59,24 @@ QUERYDIR=DB
 CLEAN=T
 
 # You can modify the E-value used to filter BLAST and HMMER. Default is 1e-5
-EVALUE=1e-5
-
-# Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom) 
-# The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific GFF. See the manual for more details
-MAXINTRON=15000
+EVALUE=1e-3
 
 # Number of threads to be used in blast searches
 THREADS=2
+
+# (Recommended) Set GEMOMA=T (with upper case) if you want to use this software to predict novel genes from tblastn alignments (PATH to jar file need to be specified in GEMOMAP variable) 
+# Otherwise, BITACORA will predict new genes by exon proximity (see the Manual for further details)
+GEMOMA=F
+
+# (Used when GEMOMA=F) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom) 
+# The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific GFF. See the manual for more details
+MAXINTRON=15000
+
+# Set GENOMICBLASTP=T in order to conduct both BLASTP and HMMER to curate novel annotated genes (Note that this option is the most sensitive but greatly depends on the database quality and could result in false positives) 
+# Otherwise, BITACORA will only use the protein domain (HMMER) to validate new annotated genes (In this case, the probability of detecting all copies is lower, but it will avoid to identify unrelated genes; See the Manual for a more detailed explanation)
+GENOMICBLASTP=F
+
+
 
 ##########################################################
 ##         		       HOW TO RUN						##
@@ -76,9 +86,8 @@ THREADS=2
 #$ bash runBITACORA.sh
 
 
-
 ##########################################################
-##			   	        PIPELINE 						##
+##                   PIPELINE - CODE                    ##
 ##########################################################
 
 echo -e "\n#######################  Running BITACORA  #######################";
@@ -93,7 +102,13 @@ if [[ ! -f $SCRIPTDIR/check_data.pl ]] ; then
 	exit 1;
 fi
 
-perl $SCRIPTDIR/check_data.pl $GFFFILE $GENOME $PROTFILE $QUERYDIR 2>BITACORAstd.err
+if [ $GEMOMA == "T" ] ; then
+	perl $SCRIPTDIR/check_data.pl $GFFFILE $GENOME $PROTFILE $QUERYDIR $GEMOMA $GEMOMAP 2>BITACORAstd.err
+fi
+
+if [ $GEMOMA != "T" ] ; then
+	perl $SCRIPTDIR/check_data.pl $GFFFILE $GENOME $PROTFILE $QUERYDIR $GEMOMA 2>BITACORAstd.err
+fi
 
 ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
 
@@ -103,7 +118,8 @@ if [ $ERRORCHECK != 0 ]; then
 	exit 1;
 fi
 
-# Run phase 1
+
+# Run step 1
 
 perl $SCRIPTDIR/runanalysis.pl $NAME $PROTFILE $QUERYDIR $GFFFILE $GENOME $EVALUE $THREADS 2>>BITACORAstd.err
 
@@ -115,11 +131,39 @@ if [ $ERRORCHECK != 0 ]; then
 	exit 1;
 fi
 
-# Run phase 2
 
-perl $SCRIPTDIR/runanalysis_2ndround_genomic_withgff.pl $NAME $PROTFILE $QUERYDIR $GENOME $GFFFILE $EVALUE $MAXINTRON $THREADS 2>>BITACORAstd.err
+# Run step 2
+
+if [ $GEMOMA == "T" ] ; then
+	if [ $GENOMICBLASTP == "T" ] ; then
+		perl $SCRIPTDIR/runanalysis_2ndround_v2_genomic_withgff_gemoma.pl $NAME $PROTFILE $QUERYDIR $GENOME $GFFFILE $EVALUE $MAXINTRON $THREADS $GEMOMAP 2>>BITACORAstd.err 2>BITACORAstd.err
+	fi
+
+	if [ $GENOMICBLASTP != "T" ] ; then
+		perl $SCRIPTDIR/runanalysis_2ndround_genomic_withgff_gemoma.pl $NAME $PROTFILE $QUERYDIR $GENOME $GFFFILE $EVALUE $MAXINTRON $THREADS $GEMOMAP 2>>BITACORAstd.err 2>BITACORAstd.err
+	fi
+fi
+
+if [ $GEMOMA != "T" ] ; then
+	if [ $GENOMICBLASTP == "T" ] ; then
+		perl $SCRIPTDIR/runanalysis_2ndround_v2_genomic_withgff.pl $NAME $PROTFILE $QUERYDIR $GENOME $GFFFILE $EVALUE $MAXINTRON $THREADS 2>>BITACORAstd.err 2>BITACORAstd.err
+	fi
+
+	if [ $GENOMICBLASTP != "T" ] ; then
+		perl $SCRIPTDIR/runanalysis_2ndround_genomic_withgff.pl $NAME $PROTFILE $QUERYDIR $GENOME $GFFFILE $EVALUE $MAXINTRON $THREADS 2>>BITACORAstd.err 2>BITACORAstd.err
+	fi
+fi
+
 
 ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
+
+if [ $ERRORCHECK != 0 ]; then
+	cat BITACORAstd.err;
+	echo -e "BITACORA died with error\n";
+	exit 1;
+fi
+
+ERRORCHECK="$(grep -c 'Segmentation' BITACORAstd.err)"
 
 if [ $ERRORCHECK != 0 ]; then
 	cat BITACORAstd.err;

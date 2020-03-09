@@ -7,7 +7,7 @@ use warnings;
 # newv: If there are hits in non-overlapping positions in the protein (i.e. two fused genes by the structural annotation software), it splits the protein (flag _split)
 
 my ($line, $name, $nameout);
-my (%blast, %fasta);
+my (%blast, %fasta, %multipledom);
 
 my $evalue = $ARGV[2];
 
@@ -24,6 +24,7 @@ while (<Blastfile>) {
 	if ($subline[6] <= $evalue){ # E-value 
 		next if ($subline[12] > $evalue); # E-value specific domain region
 		push (@{$blast{$subline[0]}}, join("\t",$subline[0], $subline[17], $subline[18]));
+		$multipledom{$subline[0]}++;
 	}
 }
 close Blastfile;
@@ -40,35 +41,35 @@ foreach my $key (sort keys %blast) {
 		@subline = split (/\t/, $blastresult);
 		my $hitblast = $key;
 
-			$hitlvl = "2";
-			my $n = 0;
-			my $extrahit = 0;
-			foreach my $i (@ini){
-				my $f = $fin[$n];
-				my $f2 = $f + 10;
-				my $i2 = $i - 10;
+		$hitlvl = "2";
+		my $n = 0;
+		my $extrahit = 0;
+		foreach my $i (@ini){
+			my $f = $fin[$n];
+			my $f2 = $f + 10;
+			my $i2 = $i - 10;
 
-				if ($i >= int($subline[1]) && $f <= int($subline[2])){
-					$ini[$n] = int($subline[1]);
-					$fin[$n] = int($subline[2]);
-				}
-				elsif ($i <= int($subline[1]) && $f < int($subline[2]) && $f2 >= int($subline[1])){
-					$fin[$n] = int($subline[2]);
-				}
-				elsif ($i > int($subline[1]) && $f >= int($subline[2]) && $i2 <= int($subline[2])){
-					$ini[$n] = int($subline[1]);
-				}
-				elsif ($f2 < int($subline[1]) || $i2 > int($subline[2])) {
-					$extrahit++;
-				}
-
-				$n++;
+			if ($i >= int($subline[1]) && $f <= int($subline[2])){
+				$ini[$n] = int($subline[1]);
+				$fin[$n] = int($subline[2]);
+			}
+			elsif ($i <= int($subline[1]) && $f < int($subline[2]) && $f2 >= int($subline[1])){
+				$fin[$n] = int($subline[2]);
+			}
+			elsif ($i > int($subline[1]) && $f >= int($subline[2]) && $i2 <= int($subline[2])){
+				$ini[$n] = int($subline[1]);
+			}
+			elsif ($f2 < int($subline[1]) || $i2 > int($subline[2])) {
+				$extrahit++;
 			}
 
-			if ($extrahit >= $n) {
-					$ini[$n] = int($subline[1]);
-					$fin[$n] = int($subline[2]);				
-			}
+			$n++;
+		}
+
+		if ($extrahit >= $n) {
+				$ini[$n] = int($subline[1]);
+				$fin[$n] = int($subline[2]);				
+		}
 
 	}
 
@@ -76,7 +77,7 @@ foreach my $key (sort keys %blast) {
 		my $hits = scalar(@ini);
 
 		if ($hits == 1){
-			print Results "$key annot $ini[0] $fin[0] hmmer\n";
+			print Results "$key annot $ini[0] $fin[0] hmmer $multipledom{$key}\n";
 		}
 		else {
 			my $n = 0;
@@ -84,7 +85,7 @@ foreach my $key (sort keys %blast) {
 				my $f = $fin[$n];
 
 				my $nn= $n+1;
-				print Results "$key\_split$nn annot $ini[$n] $fin[$n] hmmer\n";
+				print Results "$key\_split$nn annot $ini[$n] $fin[$n] hmmer $multipledom{$key}\n";
 				$n++;
 
 			}

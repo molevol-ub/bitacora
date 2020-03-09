@@ -14,6 +14,7 @@ my $dirname = dirname(__FILE__);
 my ($line, $name, $nameout);
 my $genome = $ARGV[0];
 my $querydir = $ARGV[1];
+my $gemoma = $ARGV[2];
 
 print "\n----------------- Checking input data and prerequisites\n";
 
@@ -106,6 +107,44 @@ if ($blasterr == 0 && $blastok > 0){
 
 print "BLAST installed correctly\n";
 
+# Check if GeMoMa is installed (if needed)
+
+if ($gemoma =~ /T/){
+	my $gpath = $ARGV[3];
+	system ("java -jar $gpath CLI GeMoMa info > testGemoma.out 2> testGemoma.err");
+	my $gemerr = 0;
+	#open (File, "<", "testGemoma.err");
+	#while(<File>){
+	#	chomp;
+	#	$line = $_;
+	#	next if ($line !~ /\S+/);	
+	#	if ($line =~ /Unable/){
+	#		$gemerr++;
+	#	}
+	#}
+	#close File;
+	my $gemok = 0;
+	open (File, "<", "testGemoma.out");
+	while(<File>){
+		chomp;
+		$line = $_;
+		next if ($line !~ /\S+/);	
+		if ($line =~ /GeMoMa/){
+			$gemok++;
+		}
+	}
+	close File;
+
+	if ($gemerr == 0 && $gemok > 0){
+		#OK
+	} else {
+		die "ERROR in $dirname/check_data.pl: GeMoMa could not be found\nAre you sure you set the path to GeMoMa jar file correctly and java is installed in your system?\n";
+	}
+
+	print "GeMoMa installed correctly\n";
+}
+
+
 # Check if the query dir contains proper renamed fasta and HMM files
 
 my $nfile = 0;
@@ -197,7 +236,7 @@ print "Query directory files found and named correctly in $querydir\nFound $nfil
 
 print "Everything looks fine\n----------------- DONE\n\n";
 
-system("rm testHMMER.err testHMMER.out testBLAST.err testBLAST.out testhmm.err testhmm.out testdb.err testdb.out");
+system("rm testHMMER.err testHMMER.out testBLAST.err testBLAST.out testhmm.err testhmm.out testdb.err testdb.out testGemoma.err testGemoma.out");
 
 
 

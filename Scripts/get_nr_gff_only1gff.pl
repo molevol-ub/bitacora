@@ -118,7 +118,7 @@ while (<GFFfile>) {
 			$genename = $1;
 		} 
 
-		if ($nrgeneids =~ /$genename\__/){
+		if ($nrgeneids =~ /$genename\__/ || $nrgeneids =~ /$genename/ ){
 			print Results "$line\n";
 		}
 

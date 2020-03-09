@@ -13,13 +13,13 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.0
+VERSION=1.1
 
 ##########################################################
 ##              EXPORT EXECUTABLES TO PATH              ##
 ##########################################################
 
-# Perl needs to be installed. 
+# Perl needs to be installed in the system. 
 # HMMER and BLAST executables need to be included in $PATH
 
 export PATH=$PATH:/path/to/blast/bin
@@ -97,6 +97,14 @@ fi
 perl $SCRIPTDIR/runanalysis_protein_mode.pl $NAME $PROTFILE $QUERYDIR $EVALUE $THREADS 2>>BITACORAstd.err
 
 ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
+
+if [ $ERRORCHECK != 0 ]; then
+	cat BITACORAstd.err;
+	echo -e "BITACORA died with error\n";
+	exit 1;
+fi
+
+ERRORCHECK="$(grep -c 'Segmentation' BITACORAstd.err)"
 
 if [ $ERRORCHECK != 0 ]; then
 	cat BITACORAstd.err;

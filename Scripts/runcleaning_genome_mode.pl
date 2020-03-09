@@ -39,8 +39,8 @@ foreach my $chem (@chemosensory){
 	# Moving Files
 	system("mv $chem\/* $chem\/Intermediate_files/ 2>/dev/null");
 	system("mv $chem\/Intermediate_files/*bed $chem\/");
-	system("mv $chem\/Intermediate_files/*genomic_genes_trimmed* $chem\/");
-	system("mv $chem\/Intermediate_files/*genomic_proteins_trimmed* $chem\/");	
+	system("mv $chem\/Intermediate_files/*genomic_genes_trimmed* $chem\/ 2>/dev/null");
+	system("mv $chem\/Intermediate_files/*genomic_proteins_trimmed* $chem\/ 2>/dev/null");	
 
 }
 
