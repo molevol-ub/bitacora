@@ -65,7 +65,7 @@ $ export PATH=$PATH:/path/to/hmmer/bin
 - GeMoMa (optional): By default, BITACORA reconstructs new gene models using the “close-proximity” algorithm. To use GeMoMa algorithm (Keilwagen et al., 2016; Keilwagen et al., 2018), the GeMoMa jar file (i.e. GeMoMa-1.6.2.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa.
 ```
 GEMOMAP=/path/to/GeMoMa.jar  (within runBITACORA.sh script)
-``
+```
 
 
 ## 3. Computational requirements

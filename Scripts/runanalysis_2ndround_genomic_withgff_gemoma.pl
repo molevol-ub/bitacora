@@ -6,7 +6,7 @@ my $dirname = dirname(__FILE__);
 #########################################################
 #####
 #
-# Run second analysis, identifying new proteins in the genome using GeMoMa
+# Run second analysis, identifying new proteins in the genome using GeMoMa algorithm
 #
 #####
 
