@@ -28,7 +28,7 @@ export PATH=$PATH:/path/to/hmmer/bin
 # PATH to BITACORA Scripts folder. 
 SCRIPTDIR=/path/to/Scripts
 
-# (Optional) In case of using GeMoMa, specify the PATH to jar file
+# In case of using GeMoMa (set as default), specify the PATH to jar file. Otherwise, set GEMOMA=F in editable parameters section to use the close-proximity method, which does not require any external software
 GEMOMAP=/path/to/GeMoMa.jar
 
 
@@ -67,9 +67,9 @@ EVALUE=1e-3
 # Number of threads to be used in blast searches
 THREADS=1
 
-# (Recommended) Set GEMOMA=T (with upper case) if you want to use GeMoMa software to predict novel genes from TBLASTN alignments (PATH to jar file need to be specified in GEMOMAP variable) 
-# Otherwise, BITACORA will predict new genes by exon proximity (close-proximity method)
-GEMOMA=F
+# (Default) GEMOMA=T (with upper case) will use GeMoMa software to predict novel genes from TBLASTN alignments (PATH to jar file need to be specified in GEMOMAP variable) 
+# Otherwise, set GEMOMA=F to predict new genes by exon proximity (close-proximity method)
+GEMOMA=T
 
 # (Used when GEMOMA=F; close-proximity method) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Ndom) 
 # The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific GFF. See the manual for more details
