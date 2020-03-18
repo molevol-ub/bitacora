@@ -161,23 +161,29 @@ Under this mode, BITACORA identifies de novo all members of the surveyed family 
 ## 5. Parameters 
 
 - The option CLEAN can be used to create the Intermediate_files directory where all intermediate files will be stored (see output section).
-CLEAN=T #T=true, F=false
+
+CLEAN=T  #T=true, F=false
 
 - BLAST and HMMER hits are filtered with a default cut-off E-value of 10e-5 (in addition to an internal parameter for filtering the length covered by the alignment).
-E-value can be modified in the master script runBITACORA.sh:
-EVALUE=10e-5 
+E-value can be modified in the master script runBITACORA.sh.
+
+EVALUE=10e-5  #Default
 
 - Number of threads to be used in blast searches, default is 1.
-THREADS=1
+
+THREADS=1  #Default
 
 - BITACORA can generate new gene models (for those putative genes not included in the input GFF) using two different methods. Set GEMOMA=T (with upper case) if you want to use the GeMoMa software to predict novel genes from TBLASTN alignments (the user should specify the PATH to jar file in GEMOMAP variable described in prerequisites). Otherwise (GEMOMA=F), BITACORA will predict new genes by exon proximity (close-proximity method described in the manuscript).
+
 GEMOMA=F  #Default
 
 - For the close-proximity method (GEMOMA=F option), BITACORA uses by default an upper limit value of 15 kb to join putative exons from separate but contiguous (and in the same scaffold) genome hits to build a gene model
-This value can be modified in the master script runBITACORA.sh:
+This value can be modified in the master script runBITACORA.sh.
+
 MAXINTRON=15000  #Default
 
 - New generated gene models are subsequently assessed for the presence of the specific protein family domain (with HMMER) or BLASTP hits against the FPDB, using homology-based alignments. Set GENOMICBLASTP=T to perform both BLASTP and HMMER searches to curate putative errors in these novel annotated genes. BITACORA will retain putative new genes that exhibit the protein domain OR a BLASTP hit. BITACORA can also perform this filtering step assessing only if novel annotated genes have the specific protein domain (GENOMICBLASTP=F option). The first option (GENOMICBLASTP=T) is the most sensitive but at the expense of the specificity, especially for poor quality annotations (or repetitive regions) in the FPDB that might generate wrong gene models (e.g., including non-homologous fragments). The second option (GENOMICBLASTP=F) has a higher specificity, but it could not retain some members (e.g. divergent members) that could not match the protein profile.
+
 GENOMICBLASTP=F  #Default
 
 
