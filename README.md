@@ -283,9 +283,9 @@ Joel Vizueta, Julio Rozas, Alejandro Sánchez-Gracia; Comparative Genomics Revea
 
 Moreover, if you use GeMoMa, please cite:
 
-J. Keilwagen, M. Wenk, J. L. Erickson, M. H. Schattat, J. Grau, and F. Hartung. Using intron position conservation for homology-based gene prediction. Nucleic Acids Research, 2016. https:doi: 10.1093/nar/gkw092
+J. Keilwagen, M. Wenk, J. L. Erickson, M. H. Schattat, J. Grau, and F. Hartung. Using intron position conservation for homology-based gene prediction. Nucleic Acids Research, 2016. https://doi: 10.1093/nar/gkw092
 
-J. Keilwagen, F. Hartung, M. Paulini, S. O. Twardziok, and J. Grau Combining RNA-seq data and homology-based gene prediction for plants, animals and fungi. BMC Bioinformatics, 2018. https:doi: 10.1186/s12859-018-2203-5
+J. Keilwagen, F. Hartung, M. Paulini, S. O. Twardziok, and J. Grau Combining RNA-seq data and homology-based gene prediction for plants, animals and fungi. BMC Bioinformatics, 2018. https://doi: 10.1186/s12859-018-2203-5
 
 
 ## 10. Troubleshooting
