@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.1
+VERSION=1.2
 
 ##########################################################
 ##              EXPORT EXECUTABLES TO PATH              ##
@@ -51,7 +51,7 @@ QUERYDIR=/path/to/query_folder
 ##                 EDITABLE PARAMETERS                  ##
 ##########################################################
 
-# Set CLEAN=T if you want to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the output folder
+# Set CLEAN=T if you want to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the same output folder
 CLEAN=T
 
 # You can modify the E-value used to filter BLAST and HMMER. Default is 1e-5
@@ -60,11 +60,11 @@ EVALUE=1e-3
 # Number of threads to be used in blast searches
 THREADS=1
 
-# (Recommended) Set GEMOMA=T (with upper case) if you want to use this software to predict novel genes from tblastn alignments (PATH to jar file need to be specified in GEMOMAP variable) 
-# Otherwise, BITACORA will predict new genes by exon proximity
+# (Recommended) Set GEMOMA=T (with upper case) if you want to use GeMoMa software to predict novel genes from TBLASTN alignments (PATH to jar file need to be specified in GEMOMAP variable) 
+# Otherwise, BITACORA will predict new genes by exon proximity (close-proximity method)
 GEMOMA=F
 
-# (Used when GEMOMA=F) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom) 
+# (Used when GEMOMA=F; close-proximity method) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Ndom) 
 # The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific GFF. See the manual for more details
 MAXINTRON=15000
 

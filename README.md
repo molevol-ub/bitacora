@@ -6,9 +6,12 @@
 Genome annotation is a critical bottleneck in genomic research, especially for the comprehensive study of gene families in the genomes of non-model organisms. Despite the recent progress in automatic annotation, the tools developed for this task often produce inaccurate annotations, such as fused, chimeric, partial or even completely absent gene models for many family copies, which require considerable extra efforts to be amended. Here we present BITACORA, a bioinformatics tool that integrates sequence similarity search algorithms and Perl scripts to facilitate both the curation of these inaccurate annotations and the identification of previously undetected gene family copies directly from DNA sequences. The pipeline generates general feature format (GFF) files with both curated and novel gene models, and FASTA files with the predicted proteins. The output of BITACORA can be easily integrated in genomic annotation editors, greatly facilitating subsequent semi-automatic annotation and downstream evolutionary analyses.
 
 
-New version 1.1 (Readme and manual still have to be updated for the new version):
+BITACORA up-to-date documentation can be found in: http://www.ub.edu/softevol/bitacora/
+
+
+New version 1.2:
 - Implementation of GeMoMa algorithm to recontruct new gene models
-- New parameter that allows retaining novel proteins based on HMMER or BLAST positive hits
+- New parameter that allows retaining novel proteins based on HMMER or BLASTP positive hits
 
 
 ## 0. Contents
@@ -38,6 +41,7 @@ To run the pipeline edit the master script runBITACORA.sh variables described in
 
 ## 2. Prerequisites
 
+- Perl: Perl is installed by default in most operating systems. See https://learn.perl.org/installing/ for installation instructions.
 
 - BLAST: Download blast executables from: ftp://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/LATEST/
 
@@ -52,13 +56,17 @@ To run the pipeline edit the master script runBITACORA.sh variables described in
 ```
 Or compile HMMER binaries from the source code: http://hmmer.org/
 
-- Perl: Perl is installed by default in most operating systems. See https://learn.perl.org/installing/ for installation instructions.
-
 HMMER and BLAST binaries require to be added to the PATH environment variable. Specify the correct path to bin folders in the master script runBITACORA.sh, if necessary. 
 ```
 $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
 ```
+
+- GeMoMa (optional): By default, BITACORA reconstructs new gene models using the “close-proximity” algorithm. To use GeMoMa algorithm (Keilwagen et al., 2016; Keilwagen et al., 2018), the GeMoMa jar file (i.e. GeMoMa-1.6.2.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa.
+```
+GEMOMAP=/path/to/GeMoMa.jar  (within runBITACORA.sh script)
+``
+
 
 ## 3. Computational requirements
 
@@ -147,8 +155,7 @@ BITACORA can also run with raw genome sequences (i.e., not annotated genomes; sc
 
 Under this mode, BITACORA identifies de novo all members of the surveyed family and returns a BED file with gene coordinates of the detected exons, a FASTA file with predicted proteins from these exons and a GFF3 file with the corresponding structural annotations. 
 
-[NOTE: The gene models generated under this mode are only semi-automatic predictions and require further manual annotation, i.e. using genomic annotation editors, such as Apollo. The output file of the genome mode can also be used as protein evidence in automatic annotators as MAKER2 or BRAKER1 (see output section)]
-
+[NOTE: By default, BITACORA applies the “close-proximity” algorithm to generate gene models; these models are only semi-automatic predictions and require further manual annotation (i.e. using genomic annotation editors, such as Apollo). More accurate gene models can be predicted using the GeMoMa algorithm. In addition, we highly recommend running an iterative search round, at least, to properly identify all putative gene family copies.]
 
 
 ## 5. Parameters 
@@ -163,9 +170,20 @@ EVALUE=10e-5
 - Number of threads to be used in blast searches, default is 1.
 THREADS=1
 
-- BITACORA uses by default a value of 15 kb to join putative exons from separate but contiguous (and in the same scaffold) genome hits. 
+- BITACORA can generate new gene models (for those putative genes not included in the input GFF) using two different methods. Set GEMOMA=T (with upper case) if you want to use the GeMoMa software to predict novel genes from TBLASTN alignments (the user should specify the PATH to jar file in GEMOMAP variable described in prerequisites). Otherwise (GEMOMA=F), BITACORA will predict new genes by exon proximity (close-proximity method described in the manuscript).
+GEMOMA=F  #Default
+
+- For the close-proximity method (GEMOMA=F option), BITACORA uses by default an upper limit value of 15 kb to join putative exons from separate but contiguous (and in the same scaffold) genome hits to build a gene model
 This value can be modified in the master script runBITACORA.sh:
-MAXINTRON=15000
+MAXINTRON=15000  #Default
+
+- New generated gene models are subsequently assessed for the presence of the specific protein family domain (with HMMER) or BLASTP hits against the FPDB, using homology-based alignments. Set GENOMICBLASTP=T to perform both BLASTP and HMMER searches to curate putative errors in these novel annotated genes. BITACORA will retain putative new genes that exhibit the protein domain OR a BLASTP hit. BITACORA can also perform this filtering step assessing only if novel annotated genes have the specific protein domain (GENOMICBLASTP=F option). The first option (GENOMICBLASTP=T) is the most sensitive but at the expense of the specificity, especially for poor quality annotations (or repetitive regions) in the FPDB that might generate wrong gene models (e.g., including non-homologous fragments). The second option (GENOMICBLASTP=F) has a higher specificity, but it could not retain some members (e.g. divergent members) that could not match the protein profile.
+GENOMICBLASTP=F  #Default
+
+
+##### Notes about using GeMoMa:
+We highly recommend the use of GeMoMa to construct more accurate gene models. This method uses intron position conservation for homology-based gene prediction. Nevertheless, it is more sensitive to the presence of putative errors in genome assemblies (i.e. punctual errors or fragmented scaffolds) and, therefore, could fail to identify some gene models; opposite to the close-proximity method which could report putative pseudogenes or fragment copies. Therefore, we encourage the user to check both methods in order to ensure the identification of all putative gene family copies in the surveyed genome.
+
 
 ##### Notes on the parameter MAXINTRON
 
@@ -204,7 +222,7 @@ BED files with non-redundant merged blast hits in genome sequence:
 - YOURFPDBtblastn_parsed_list_genomic_positions_nogff_filtered.bed: BED file with merged blast alignment in all genomic regions.
 
 
-In addition, BITACORA generates the following Intermediate files (located into Intermediate_files folder created in cleaning, if active)
+In addition, BITACORA generates the following Intermediate files (located into Intermediate_files folder if CLEAN=T). These files contain information of some intermediate steps of the analysis, such as the original or untrimmed gene models:
 
 	- YOURFPDB_annot_genes.gff3 and YOURFPDB_proteins.fasta: GFF3 and fasta file containing the original untrimmed models for the identified proteins.
 	- YOURFPDB_annot_genes_trimmed.gff3 and YOURFPDB_proteins_trimmed.fasta: GFF3 and fasta containing only the curated model for the identified annotated proteins (trimming exons if not aligned to query FPDB sequences or split putative fused genes)
@@ -225,22 +243,16 @@ In addition, BITACORA generates the following Intermediate files (located into I
 
 ##### Notes on BITACORA output
 
-The obtained proteins could be used for further prospective analyses or to facilitate a more curated annotation using genome annotation editors or, in the case of having a high number of not annotated proteins in the GFF, BITACORA output sequences could also be used as evidence to improve the annotation of automatic annotators as MAKER2 or BRAKER1. However, a first validation of the obtained proteins should be performed, more specifically in those obtained newly from genome (taking into account the parameter used to join putative exons, to split putative joined genes or join exons from the same gene). In addition, these proteins obtained and assembled from genomic regions are illustrative, but more putative genes (true negatives) could be obtained from the TBLASTN BED file positions discarded for not being identified with the protein domain (i.e. alignments containing introns between two proximal exons could lead not to identify the domain in the protein).
+The identified proteins could be used for further prospective analyses, or to facilitate a more curated annotation using genome annotation editors (such as Apollo). In particular, it is recommended to perform a first validation of the new identified proteins when using the close-proximity method. Among other aspects, it is important to check the parameter used to join putative exons, or to determine if some models need to be split or joined (erroneous joined genes, or absence of joined exons from the same gene). It is important to note that the identified proteins (from the genomic regions) are illustrative, and other members could be encoded in the genome but were not identified (true negatives, i.e. divergent genes that do not match the protein profile). We recommend using the parameter BLASTPHMMER=T in order to retain new divergent copies also based on BLASTP alignments. 
 
-Such validation to identify putative erroneously assigned proteins (mainly caused by the inclusion of contaminant sequences in the query database) could consist in aligning all proteins and checking the MSA, constructing the phylogeny of the gene with related species or the gene family; doing a reduced blast with NCBI-nr database or obtaining structural particularities of the proteins (i.e. characterizing protein domains as transmembrane domains, signal peptides...). See our manuscript Vizueta et al. (2018) for an example of such analyses.
+In addition, if there are BITACORA identified sequences containing stop codons, codified as “X”, it could be artefactual from TBLASTN hits if they are in the beginning or end of an exon or, otherwise, those genes are probably pseudogenes.
 
-In particular, BITACORA full and genome mode is also designed to facilitate the gene annotation in editors as Apollo. For that, the use of the following files would be useful:
+A validation to identify putative erroneously assigned proteins (mainly caused by the inclusion of contaminant sequences in the query database) could consist in aligning all proteins and checking the MSA, constructing the phylogeny of the gene family including related species; doing a reduced blast with NCBI-nr database or obtaining structural particularities of the proteins (i.e. characterizing protein domains as transmembrane domains, signal peptides, etc.). See Vizueta et al. (2018) for an example of such analyses.
 
-- Original GFF3
-- Final GFF3 with curated models for the annotated proteins
-- BED file from TBLASTN search
-
- 
-
-If sequences contain stop codons, codified as “X”, it could be artifactual from TBLASTN hits if they are in the beginning or end of an exon or, otherwise, those genes are probably pseudogenes.
-
-Nonetheless, again, new proteins identified from unannotated genomic regions should be properly annotated using genome browser annotation tools such as Apollo, or could be used as evidence to improve the annotation of automatic annotators as MAKER2 or BRAKER1. We estimate an approximate number of them which could be used for prospective analyses.
-
+In particular, BITACORA full and genome mode is also designed to facilitate the gene annotation in editors as Apollo (Figure 2). For that, the use of the following files would be useful (see an example in Documentation/example_Apollo.png):
+-	Original GFF3
+-	Final GFF3 with curated models for the annotated proteins
+-	BED files from TBLASTN search
 
 
 ## 8. Example
@@ -256,11 +268,16 @@ $ bash runBITACORA.sh
 ## 9. Citation
 
 
-Joel Vizueta, Alejandro Sánchez-Gracia, and Julio Rozas (2019): BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. bioRxiv. https://doi.org/10.1101/593889
-
-Moreover, you can also cite the following article where we describe the protein annotation procedure:
+Joel Vizueta, Alejandro Sánchez-Gracia, and Julio Rozas. 2019. BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. bioRxiv. https://doi.org/10.1101/593889
 
 Joel Vizueta, Julio Rozas, Alejandro Sánchez-Gracia; Comparative Genomics Reveals Thousands of Novel Chemosensory Genes and Massive Changes in Chemoreceptor Repertories across Chelicerates, Genome Biology and Evolution, Volume 10, Issue 5, 1 May 2018, Pages 1221–1236, https://doi.org/10.1093/gbe/evy081
+
+
+Moreover, if you use GeMoMa, please cite:
+
+J. Keilwagen, M. Wenk, J. L. Erickson, M. H. Schattat, J. Grau, and F. Hartung. Using intron position conservation for homology-based gene prediction. Nucleic Acids Research, 2016. doi: 10.1093/nar/gkw092
+
+J. Keilwagen, F. Hartung, M. Paulini, S. O. Twardziok, and J. Grau Combining RNA-seq data and homology-based gene prediction for plants, animals and fungi. BMC Bioinformatics, 2018. doi: 10.1186/s12859-018-2203-5
 
 
 ## 10. Troubleshooting
@@ -269,7 +286,7 @@ Joel Vizueta, Julio Rozas, Alejandro Sánchez-Gracia; Comparative Genomics Revea
 When BITACORA detects any error related to input data, it stops and prints the description of the error. Please check the error and your data.
 
 If you are getting errors related to parsing the GFF file, take into account that BITACORA expects proteins ID to be as ID in mRNA rows from GFF3. 
-In case of protein ID and mRNA ID causing error as they are not the named equally, first, you can use the script located in Scripts/Tools/get_proteins_notfound_ingff.pl to check which proteins are not found in the GFF3 file, as detailed in the Error message. You could use only those proteins found in the GFF3 in BITACORA.
+In case of protein ID and mRNA ID causing error as they are not named equally, first, you can use the script located in Scripts/Tools/get_proteins_notfound_ingff.pl to check which proteins are not found in the GFF3 file, as detailed in the Error message. You could use only those proteins found in the GFF3 in BITACORA.
 If all proteins are named differently in the GFF3, you can obtain a protein file from the GFF3 using the script Scripts/gff2fasta_v3.pl and use that protein file as input to BITACORA.
 You could also modify the perl module Readgff.pm to allow BITACORA to read your data. Otherwise, modify the GFF, preferably, as GFF3 format. 
 

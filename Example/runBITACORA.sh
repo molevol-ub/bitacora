@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.1
+VERSION=1.2
 
 ##########################################################
 ##    		   EXPORT EXECUTABLES TO PATH 				##
@@ -65,7 +65,7 @@ EVALUE=1e-3
 THREADS=2
 
 # (Recommended) Set GEMOMA=T (with upper case) if you want to use this software to predict novel genes from tblastn alignments (PATH to jar file need to be specified in GEMOMAP variable) 
-# Otherwise, BITACORA will predict new genes by exon proximity (see the Manual for further details)
+# Otherwise, BITACORA will predict new genes by exon proximity
 GEMOMA=F
 
 # (Used when GEMOMA=F) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom) 
@@ -73,7 +73,7 @@ GEMOMA=F
 MAXINTRON=15000
 
 # Set GENOMICBLASTP=T in order to conduct both BLASTP and HMMER to curate novel annotated genes (Note that this option is the most sensitive but greatly depends on the database quality and could result in false positives) 
-# Otherwise, BITACORA will only use the protein domain (HMMER) to validate new annotated genes (In this case, the probability of detecting all copies is lower, but it will avoid to identify unrelated genes; See the Manual for a more detailed explanation)
+# Otherwise, BITACORA will only use the protein domain (HMMER) to validate new annotated genes (In this case, the probability of detecting all copies is lower, but it will avoid to identify unrelated genes)
 GENOMICBLASTP=F
 
 
