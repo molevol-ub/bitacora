@@ -10,7 +10,7 @@ BITACORA up-to-date documentation can be found in: http://www.ub.edu/softevol/bi
 
 
 New version 1.2:
-- Implementation of GeMoMa algorithm to recontruct new gene models (set as default)
+- Implementation of GeMoMa algorithm to reconstruct new gene models (set as default)
 - New parameter that allows retaining novel proteins based on HMMER or BLASTP positive hits
 
 
