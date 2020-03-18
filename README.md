@@ -177,7 +177,7 @@ THREADS=1  #Default
 - BITACORA can generate new gene models (for those putative genes not included in the input GFF) using two different methods. By default (GEMOMA=T), BITACORA will use the GeMoMa software to predict novel genes from TBLASTN alignments (the user must specify the PATH to jar file in GEMOMAP variable described in prerequisites). 
 Otherwise (GEMOMA=F), BITACORA will predict new genes by exon proximity (close-proximity method described in the manuscript).
 ```
-GEMOMA=F  #Default
+GEMOMA=T  #Default
 ```
 - For the close proximity method (GEMOMA=F option), BITACORA uses by default an upper limit value of 15 kb to join putative exons from separate but contiguous (and in the same scaffold) genome hits to build a gene model
 This value can be modified in the master script runBITACORA.sh.
@@ -233,7 +233,7 @@ BED files with the location of all putative identified exons from TBLASTN hits i
 
 In addition, BITACORA generates the following Intermediate files (located into Intermediate_files folder if CLEAN=T). These files contain information of some intermediate steps of the analysis, such as the original or untrimmed gene models, and multiples files stored for debugging or as controls:
 
-	-YOURFPDB_annot_genes.gff3 and YOURFPDB_proteins.fasta: GFF3 and FASTA file containing the original untrimmed models for the identified proteins in the input GFF (from BITACORA Step 1).
+	- YOURFPDB_annot_genes.gff3 and YOURFPDB_proteins.fasta: GFF3 and FASTA file containing the original untrimmed models for the identified proteins in the input GFF (from BITACORA Step 1).
 	- YOURFPDB_annot_genes_trimmed.gff3 and YOURFPDB_proteins_trimmed.fasta: GFF3 and fasta containing only the curated model for the identified annotated proteins (trimming exons if not aligned to query FPDB sequences or splitting putative fused genes in Step 1).
 	- YOURFPDB_genomic_genes.gff3: GFF3 containing newly identified and untrimmed proteins in genomic sequences (from BITACORA Step 2). 
 	- YOURFPDB_genomic_genes_trimmed.gff3: GFF3 containing newly identified proteins in the genomic mode, curated by the positions identified in the HMM profile (from Step 2).
@@ -256,7 +256,7 @@ In addition, BITACORA generates the following Intermediate files (located into I
 
 The proteins identified with BITACORA can be used either for further prospective analyses or to facilitate a more curated annotation using genome annotation editors (such as Apollo). In the first case, it is recommended to perform some validation of the newly identified proteins, especially when using the close proximity algorithm. It is important to determine if gene models need to be split or joined (i.e., if the parameter MAXINTRON needs to be modified). For highly divergent gene families, we also recommend using the parameter BLASTPHMMER=T in order to identify distant homologs. In addition, it would be also useful to build an MSA, constructing a tree of the gene family including members of other closely related species, or checking for characteristic structural features of the protein (i.e. the presence of transmembrane domains, signal peptides, etc.). See Vizueta et al. (2018) for some examples.
 
-In the second case, BITACORA is also designed to facilitate the annotation of the generated gene models in editors as Apollo (Figure 2). The specific files that can be used for this purpose are (see an example in Documentation/example_Apollo.png):
+In the second case, BITACORA is also designed to facilitate the annotation of the generated gene models in editors as Apollo. The specific files that can be used for this purpose are (see an example in Documentation/example_Apollo.png):
 -	Original GFF3
 -	Final GFF3 with curated models for the annotated proteins
 -	BED files from TBLASTN search
@@ -283,9 +283,9 @@ Joel Vizueta, Julio Rozas, Alejandro Sánchez-Gracia; Comparative Genomics Revea
 
 Moreover, if you use GeMoMa, please cite:
 
-J. Keilwagen, M. Wenk, J. L. Erickson, M. H. Schattat, J. Grau, and F. Hartung. Using intron position conservation for homology-based gene prediction. Nucleic Acids Research, 2016. doi: 10.1093/nar/gkw092
+J. Keilwagen, M. Wenk, J. L. Erickson, M. H. Schattat, J. Grau, and F. Hartung. Using intron position conservation for homology-based gene prediction. Nucleic Acids Research, 2016. https:doi: 10.1093/nar/gkw092
 
-J. Keilwagen, F. Hartung, M. Paulini, S. O. Twardziok, and J. Grau Combining RNA-seq data and homology-based gene prediction for plants, animals and fungi. BMC Bioinformatics, 2018. doi: 10.1186/s12859-018-2203-5
+J. Keilwagen, F. Hartung, M. Paulini, S. O. Twardziok, and J. Grau Combining RNA-seq data and homology-based gene prediction for plants, animals and fungi. BMC Bioinformatics, 2018. https:doi: 10.1186/s12859-018-2203-5
 
 
 ## 10. Troubleshooting
