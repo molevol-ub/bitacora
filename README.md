@@ -62,7 +62,7 @@ $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
 ```
 
-- GeMoMa: By default, BITACORA reconstructs new gene models using the GeMoMa algorithm (Keilwagen et al., 2016; Keilwagen et al., 2018). The GeMoMa jar file (i.e. GeMoMa-1.6.2.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa.
+- GeMoMa: By default, BITACORA reconstructs new gene models using the GeMoMa algorithm (Keilwagen et al., 2016; 2018). The GeMoMa jar file (i.e. GeMoMa-1.6.2.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa.
 ```
 GEMOMAP=/path/to/GeMoMa.jar  (within runBITACORA.sh script)
 ```
@@ -226,28 +226,28 @@ Non-redundant data: Relevant information excluding identical proteins or those c
 - YOURFPDB_genomic_and_annotated_genes_trimmed_nr.gff3: GFF3 file containing all non-redundant curated models.
 - YOURFPDB_genomic_and_annotated_proteins_trimmed.fasta: A fasta file containing the non-redundant protein sequences corresponding to the curated models.
 
-BED files with the location of all putative identified exons from TBLASTN hits in the genome sequence:
-- YOURFPDBtblastn_parsed_list_genomic_positions.bed: BED file with genomic coordinates of  putative exons located in non-annotated regions (i.e. absent in the input GFF).
-- YOURFPDBtblastn_parsed_list_genomic_positions_nogff_filtered.bed: BED file with the genomic coordinates of all putative exons.
+BED files with the location of TBLASTN hits in the genome sequence:
+- YOURFPDBtblastn_parsed_list_genomic_positions.bed: BED file with the genomic coordinates of the TBLASTN hits involving a putative novel exon (i.e. absent in the input GFF).
+- YOURFPDBtblastn_parsed_list_genomic_positions_nogff_filtered.bed: BED file with the genomic coordinates of all TBLASTN hits.
 
 
 In addition, BITACORA generates the following Intermediate files (located into Intermediate_files folder if CLEAN=T). These files contain information of some intermediate steps of the analysis, such as the original or untrimmed gene models, and multiples files stored for debugging or as controls:
 
-	- YOURFPDB_annot_genes.gff3 and YOURFPDB_proteins.fasta: GFF3 and FASTA file containing the original untrimmed models for the identified proteins in the input GFF (from BITACORA Step 1).
-	- YOURFPDB_annot_genes_trimmed.gff3 and YOURFPDB_proteins_trimmed.fasta: GFF3 and fasta containing only the curated model for the identified annotated proteins (trimming exons if not aligned to query FPDB sequences or splitting putative fused genes in Step 1).
-	- YOURFPDB_genomic_genes.gff3: GFF3 containing newly identified and untrimmed proteins in genomic sequences (from BITACORA Step 2). 
-	- YOURFPDB_genomic_genes_trimmed.gff3: GFF3 containing newly identified proteins in the genomic mode, curated by the positions identified in the HMM profile (from Step 2).
-	- Hmmer folder containing the output of HMMER searches against the annotated proteins and novel proteins identified in the genome.
-	- GeMoMa folder containing the obtained raw gene models.
-	- YOURFPDBgfftrimmed.cds.fasta and YOURFPDBgfftrimmed.pepfasta: Files containing CDS and protein sequences translated directly from YOURFPDB_annot_genes_trimmed.gff3 (used for debugging purposes)
+	- YOURFPDB_annot_genes.gff3 and YOURFPDB_proteins.fasta: GFF3 and FASTA files containing the original untrimmed models and proteins of all genes identified in the Step 1 (Fig. 1). (Fig. 1 BITACORA workflow).
+	- YOURFPDB_annot_genes_trimmed.gff3 and YOURFPDB_proteins_trimmed.fasta: GFF3 and FASTA files containing the curated models for the proteins identified and annotated in the Step 1 (Fig. 1).
+	- YOURFPDB_genomic_genes.gff3: GFF3 file containing the untrimmed structural annotations for the proteins identified in BITACORA Step 2 (Fig. 1). 
+	- YOURFPDB_genomic_genes_trimmed.gff3: GGFF3 file containing the structural annotations for the proteins identified in BITACORA Step 2 (Fig. 1) after curation based in HMM profile or BLASTP hits.
+	- /Hmmer folder containing the output of HMMER searches against both previously annotated and newly identified proteins.
+	- /GeMoMa folder containing the raw gene models obtained with GeMoMa.
+	- YOURFPDBgfftrimmed.cds.fasta and YOURFPDBgfftrimmed.pepfasta: Files containing the CDS and protein sequences from YOURFPDB_annot_genes_trimmed.gff3 (used for debugging purposes)
 	- YOURFPDBgffgenomictrimmed.cds.fasta and YOURFPDBgffgenomictrimmed.pep.fasta: Files containing CDS and protein sequences translated directly from YOURFPDB_genomic_genes_trimmed.gff3
-	- YOURFPDB_blastp.outfmt6: BLASTP output of the search of the query FPDB against the annotated proteins.
-	- YOURFPDB_tblastn.outfmt6: TBLASTN output of the search of the query FPDB against the genomic sequence.
+	- YOURFPDB_blastp.outfmt6: BLASTP output of the searches that use FPDB as a query against the annotated proteins.
+	- YOURFPDB_tblastn.outfmt6: : TBLASTN output of the searches that use FPDB as a query against the genomic sequence.
 	- YOURFPDB_blastp_parsed_list.txt; YOURFPDB_hmmer_parsed_list.txt; YOURFPDB_allsearches_list.txt; YOURFPDB_combinedsearches_list.txt: Parsed coordinate files combining all hits from BLASTP and HMMER outputs.
-	- YOURFPDB_tblastn_parsed_list_genomic_positions.txt (and _notgff_filtered): File containing the positions identified after parsing the TBLASTN search. 
-	- YOURFPDB_prots_VsGFF_badannot_list.txt and YOURFPDB_goodannot_list.txt: Debugging files: These files are for checking that the identified proteins and the protein models in the GFF3 codify the same protein. If the file badannot_list.txt contains some identifier, it means that the GFF3 annotation is incorrect pointing to a bad annotation in the original GFF3. Please, try to translate the CDS for that protein into the 3 reading frames and check if the 2nd or 3rd frame codify for the protein in question stored in "YOURFPDB_genomic_and_annotated_proteins_trimmed_nr.fasta". If correct, modify the GFF3 by adding 1 or 2 nucleotide position in the start of the GFF3 (take into account if it is transcribed from forward or reverse strand). If negative, please report the error via GitHub.
-	- YOURFPDB_genomic_genes_proteins.fasta: It contains all merged exons from putative novel proteins identified in the genome before filtering those without the protein domain identified with HMMER. This file could be useful in case of using an HMM profile not trained with your sequences which cannot detect divergent sequences, such as remote homologs.
-	- YOURFPDB_genomic_exon_proteins.fasta: contains the exon sequences joined into genes in the aforementioned file.
+	- YOURFPDB_tblastn_parsed_list_genomic_positions.txt (and _notgff_filtered): File containing coordinates of parsed TBLASTN results. 
+	- YOURFPDB_prots_VsGFF_badannot_list.txt and YOURFPDB_goodannot_list.txt: Debugging files: Debugging files: Files to check the perfect match between the identified proteins and the GFF3 annotations. If the file badannot_list.txt is not empty, the GFF3 has annotation errors (from the original GFF3). Please, search in "YOURFPDB_genomic_and_annotated_proteins_trimmed_nr.fasta" for the correct protein in any of the two other reading frames. Once you find the correct translation, modify the GFF3 by adding 1 or 2 nucleotide position in the start of the GFF3 (check the strand). If you are unable to fix this problem, please report the error via GitHub.
+	- YOURFPDB_genomic_genes_proteins.fasta: FASTA file containing the raw predicted protein sequences encoded in novel gene models obtained in BITACORA Step 2 (Fig. 1). Note that this file has not been subjected to the HMMER or BLASTP filter and some annotations could contain errors. 
+	- YOURFPDB_genomic_exon_proteins.fasta: FASTA file with the exon sequences that have been joined into genes in the aforementioned file (in case of using the close-proximity method).
 	- Additional generated files are stored for pipeline debugging and controls.
 
 
