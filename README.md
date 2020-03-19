@@ -227,8 +227,8 @@ Non-redundant data: Relevant information excluding identical proteins or those c
 - YOURFPDB_genomic_and_annotated_proteins_trimmed.fasta: A fasta file containing the non-redundant protein sequences corresponding to the curated models.
 
 BED files with the location of TBLASTN hits in the genome sequence:
-- YOURFPDBtblastn_parsed_list_genomic_positions.bed: BED file with the genomic coordinates of the TBLASTN hits involving a putative novel exon (i.e. absent in the input GFF).
 - YOURFPDBtblastn_parsed_list_genomic_positions_nogff_filtered.bed: BED file with the genomic coordinates of all TBLASTN hits.
+- YOURFPDBtblastn_parsed_list_genomic_positions.bed: BED file with the genomic coordinates of the TBLASTN hits involving putative novel exons (i.e. absent in the input GFF).
 
 
 In addition, BITACORA generates the following Intermediate files (located into Intermediate_files folder if CLEAN=T). These files contain information of some intermediate steps of the analysis, such as the original or untrimmed gene models, and multiples files stored for debugging or as controls:
@@ -244,7 +244,7 @@ In addition, BITACORA generates the following Intermediate files (located into I
 	- YOURFPDB_blastp.outfmt6: BLASTP output of the searches that use FPDB as a query against the annotated proteins.
 	- YOURFPDB_tblastn.outfmt6: : TBLASTN output of the searches that use FPDB as a query against the genomic sequence.
 	- YOURFPDB_blastp_parsed_list.txt; YOURFPDB_hmmer_parsed_list.txt; YOURFPDB_allsearches_list.txt; YOURFPDB_combinedsearches_list.txt: Parsed coordinate files combining all hits from BLASTP and HMMER outputs.
-	- YOURFPDB_tblastn_parsed_list_genomic_positions.txt (and _notgff_filtered): File containing coordinates of parsed TBLASTN results. 
+	- - YOURFPDB_tblastn_parsed_list_genomic_positions.txt and YOURFPDB_tblastn_parsed_list_genomic_positions_notgff_filtered.txt Files containing coordinates of parsed TBLASTN results. 
 	- YOURFPDB_prots_VsGFF_badannot_list.txt and YOURFPDB_goodannot_list.txt: Debugging files: Debugging files: Files to check the perfect match between the identified proteins and the GFF3 annotations. If the file badannot_list.txt is not empty, the GFF3 has annotation errors (from the original GFF3). Please, search in "YOURFPDB_genomic_and_annotated_proteins_trimmed_nr.fasta" for the correct protein in any of the two other reading frames. Once you find the correct translation, modify the GFF3 by adding 1 or 2 nucleotide position in the start of the GFF3 (check the strand). If you are unable to fix this problem, please report the error via GitHub.
 	- YOURFPDB_genomic_genes_proteins.fasta: FASTA file containing the raw predicted protein sequences encoded in novel gene models obtained in BITACORA Step 2 (Fig. 1). Note that this file has not been subjected to the HMMER or BLASTP filter and some annotations could contain errors. 
 	- YOURFPDB_genomic_exon_proteins.fasta: FASTA file with the exon sequences that have been joined into genes in the aforementioned file (in case of using the close-proximity method).
