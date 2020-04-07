@@ -211,7 +211,11 @@ foreach my $chem (@chemosensory){
 	print "Using GeMoMa to predict novel genes\n";
 
 	system ("mkdir -p $chem/gemoma_outdir");
-	system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6 t=$genome c=$chem\/$chem\_db_masannot_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
+
+	# Filter tblastn file to exclude hits in same scaffold positions that cause errors in gemoma
+	system ("perl $dirname/get_tblastn_filtered_forgemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
+
+	system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_masannot_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
 
 	# Check if GeMoMa finished without errors
 	my $gemoerr = "0";
