@@ -8,10 +8,10 @@ use warnings;
 # usage: perl get_blastp_parsed_newv2.pl blast_outfmt6_file(-outfmt "6 std qlen slen") Output_name E-value
 
 my ($line, $name, $nameout);
-my (%blast, %fasta);
+my (%blast, %fasta, %length);
 
 my $evalue = $ARGV[2];
-
+my $minlengthcut = "30"; ## Minimum positions required to trim a protein (i.e. blast hits starting in position 10 will report the full sequence instead of trimming the first 10 aa)
 
 #Opening blast results
 
@@ -23,6 +23,7 @@ while (<Blastfile>) {
 	my @subline = split (/\t/, $line);
 	next if ($subline[10] > $evalue); # Evalue filtering
 	push (@{$blast{$subline[1]}}, join("\t",$subline[0], $subline[10], $subline[3], $subline[13], $subline[12], $subline[8], $subline[9], $subline[2]));
+	$length{$subline[1]} = $subline[13];
 }
 close Blastfile;
 
@@ -40,7 +41,7 @@ foreach my $key (sort keys %blast) {
 		my $filtro1 = ($subline[4]*2)/3;
 		my $filtro2 = ($subline[3]*0.8);
 
-		if ($subline[2] < 51) { # If the alignment is lower than 50aa, and smaller than 2/3 QUERY length protein used, it should contain a similarity higher than 80%. If not it is remove as false positive (small domains hitting non-related proteins)
+		if ($subline[2] < 51) { # If the alignment is lower than 50aa, and smaller than 2/3 QUERY length protein used, it should contain a similarity higher than 80%. If not it is removed as false positive (small domains hitting non-related proteins)
 			unless ($subline[2] >= $filtro1){
 				next if ($subline[7] < 80);
 			}
@@ -83,15 +84,38 @@ foreach my $key (sort keys %blast) {
 		my $hits = scalar(@ini);
 
 		if ($hits == 1){
-			print Results "$key annot $ini[0] $fin[0] blastp\n";
+
+			# Length filter to avoid exluding a few ($minlengthcut) initial or end positions
+			my $ipos = $ini[0];
+			my $fpos = $fin[0];
+			if ($ipos <= $minlengthcut){ # Initial position
+				$ipos = 1;
+			}
+			my $filterend = $length{$key} - $minlengthcut;
+			if ($fpos >= $filterend){ # Initial position
+				$fpos = $length{$key};
+			}
+
+			print Results "$key annot $ipos $fpos blastp\n";
 		}
 		else {
 			my $n = 0;
 			foreach my $i (@ini){
 				my $f = $fin[$n];
 
+				# Length filter to avoid exluding a few ($minlengthcut) initial or end positions
+				my $ipos = $ini[$n];
+				my $fpos = $fin[$n];
+				if ($ipos <= $minlengthcut){ # Initial position
+					$ipos = 1;
+				}
+				my $filterend = $length{$key} - $minlengthcut;
+				if ($fpos >= $filterend){ # Initial position
+					$fpos = $length{$key};
+				}
+
 				my $nn= $n+1;
-				print Results "$key\_split$nn annot $ini[$n] $fin[$n] blastp\n";
+				print Results "$key\_split$nn annot $ipos $fpos blastp\n";
 				$n++;
 
 			}

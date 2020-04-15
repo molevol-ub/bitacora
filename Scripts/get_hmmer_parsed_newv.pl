@@ -7,9 +7,10 @@ use warnings;
 # newv: If there are hits in non-overlapping positions in the protein (i.e. two fused genes by the structural annotation software), it splits the protein (flag _split)
 
 my ($line, $name, $nameout);
-my (%blast, %fasta, %multipledom);
+my (%blast, %fasta, %multipledom, %length);
 
 my $evalue = $ARGV[2];
+my $minlengthcut = "30"; ## Minimum positions required to trim a protein (i.e. blast hits starting in position 10 will report the full sequence instead of trimming the first 10 aa)
 
 #Opening HMMER results
 
@@ -25,6 +26,7 @@ while (<Blastfile>) {
 		next if ($subline[12] > $evalue); # E-value specific domain region
 		push (@{$blast{$subline[0]}}, join("\t",$subline[0], $subline[17], $subline[18]));
 		$multipledom{$subline[0]}++;
+		$length{$subline[0]} = $subline[2];
 	}
 }
 close Blastfile;
@@ -77,15 +79,38 @@ foreach my $key (sort keys %blast) {
 		my $hits = scalar(@ini);
 
 		if ($hits == 1){
-			print Results "$key annot $ini[0] $fin[0] hmmer $multipledom{$key}\n";
+
+			# Length filter to avoid exluding a few ($minlengthcut) initial or end positions
+			my $ipos = $ini[0];
+			my $fpos = $fin[0];
+			if ($ipos <= $minlengthcut){ # Initial position
+				$ipos = 1;
+			}
+			my $filterend = $length{$key} - $minlengthcut;
+			if ($fpos >= $filterend){ # Initial position
+				$fpos = $length{$key};
+			}
+
+			print Results "$key annot $ipos $fpos hmmer $multipledom{$key}\n";
 		}
 		else {
 			my $n = 0;
 			foreach my $i (@ini){
 				my $f = $fin[$n];
 
+				# Length filter to avoid exluding a few ($minlengthcut) initial or end positions
+				my $ipos = $ini[$n];
+				my $fpos = $fin[$n];
+				if ($ipos <= $minlengthcut){ # Initial position
+					$ipos = 1;
+				}
+				my $filterend = $length{$key} - $minlengthcut;
+				if ($fpos >= $filterend){ # Initial position
+					$fpos = $length{$key};
+				}
+
 				my $nn= $n+1;
-				print Results "$key\_split$nn annot $ini[$n] $fin[$n] hmmer $multipledom{$key}\n";
+				print Results "$key\_split$nn annot $ipos $fpos hmmer $multipledom{$key}\n";
 				$n++;
 
 			}

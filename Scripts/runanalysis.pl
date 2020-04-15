@@ -104,7 +104,7 @@ foreach my $chem (@chemosensory){
 	# Validating the obtained GFF3
 
 	system ("blastp -query $chem/$chem\_proteins_trimmed.fasta -subject $chem/$chem"."gfftrimmed.pep.fasta -out $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_proteins_trimmed.fasta $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 $chem\/$chem");
+	system ("perl $dirname/confirm_GFF_proteins_withlength.pl $chem/$chem\_proteins_trimmed.fasta $chem\/$chem\_protsVsGFF\_blastp\.outfmt6 $chem\/$chem");
 
 
 	# Counting numbers

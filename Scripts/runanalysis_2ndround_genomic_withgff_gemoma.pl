@@ -539,14 +539,12 @@ foreach my $chem (@chemosensory){
 
 	## Generating a GFF for genomic genes
 
-	#system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_gemoma_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
+	system ("perl $dirname/get_annot_genomic_genes_gff_v2.pl $chem/$chem\_genomic_genes.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 
 	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem"."gffgenomictrimmed.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
-
+	system ("perl $dirname/confirm_GFF_proteins_withlength.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 	# Creating a final GFF for all annotations
 	system("perl $dirname/get_nr_gff.pl $chem/$chem\_genomic_and_annotated_proteins_trimmed_nr.fasta $chem/$chem\_annot_genes_trimmed.gff3 $chem/$chem\_genomic_genes_trimmed.gff3 $chem/$chem\_genomic_and_annotated_genes_nr.gff3");

@@ -71,7 +71,7 @@ while (<File>) {
 ##		my $n = 1;
 ##		foreach my $cds (@{$gffcds{$gene}}) {
 ##			my @subl3 = split (/\t/, $cds);
-##			print Results "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$subline[0]\.CDS$n;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";		
+##			print Results "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$subline[0]\.CDS$n;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";		
 ##			$n++;
 ##		}
 ###
@@ -85,7 +85,7 @@ while (<File>) {
 			@posorder = sort { $a <=> $b } @positions;
 		} elsif ($subl2[6] =~ /\-/){
 			@posorder = sort { $b <=> $a } @positions;
-		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
 
 		foreach my $posit (@posorder){
 			foreach my $cds (@{$gffcds{$gene}{$posit}}) {
@@ -110,7 +110,7 @@ while (<File>) {
 			@posorder = sort { $a <=> $b } @positions;
 		} elsif ($subl2[6] =~ /\-/){
 			@posorder = sort { $b <=> $a } @positions;
-		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
 
 		foreach my $posit (@posorder){
 			foreach my $cds (@{$gffcds{$gene}{$posit}}) {
@@ -120,7 +120,7 @@ while (<File>) {
 			}
 		}
 
-	} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Protein gene $subline[0] is not found in the GFF3\n";}
+	} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Protein gene $subline[0] is not found in the GFF3\n";}
 	
 }
 close File;
@@ -173,7 +173,7 @@ while (<File>) {
 		$gene = $gene;
 	} elsif (exists $gffgene{$genera}){
 		$gene = $genera;
-	} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Protein gene $gene $subline[0] is not found in the GFF3\n";}
+	} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Protein gene $gene $subline[0] is not found in the GFF3\n";}
 
 
 	my $printcds;
@@ -182,6 +182,7 @@ while (<File>) {
 
 		my $inigene = 0; my $endgene = 0; my $endgenereached = 0; my $inicuted = 0; my $endcuted = 0;
 		my $prelength = 0; my $precdslength = 0;
+		my $firstcds = $subline[2]; ## To avoid modifying first cds if it starts from first position
 		my $ncds = 1;
 
 		my $ifix = 0;
@@ -194,7 +195,7 @@ while (<File>) {
 			@posorder = sort { $a <=> $b } @positions;
 		} elsif ($subl2[6] =~ /\-/){
 			@posorder = sort { $b <=> $a } @positions;
-		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
 
 
 
@@ -245,9 +246,10 @@ while (<File>) {
 
 
 			if ($inicuted >= $subl3[3] && $endcuted <= $subl3[4]){
-				$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$inicuted\t$endcuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
-				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				$endgenereached++;
+				next if ($endcuted <= $inicuted); ## check gene structure
+				$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$inicuted\t$endcuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				#$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				#if ($inigene == 0 || $inigene )
 			} 
 			elsif ($endcuted <= $subl3[3]){
@@ -261,8 +263,14 @@ while (<File>) {
 				next;
 			}
 			elsif ($inicuted >= $subl3[3] && $endcuted >= $subl3[4]){
-				$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$inicuted\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
-				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n"; # Pruebo a ver si sacando ese cds completo queda bien: NADA, sigue quedando mal la proteína, y algunas son extra largas con otros dominios en el mismo CDS anotado así que nada
+				if ($firstcds == 1){ ## not to modify first exon starting in alignment from first position
+					$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+					$firstcds++;
+				} else {
+					$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$inicuted\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				}
+				###$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$inicuted\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				#$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n"; # Pruebo a ver si sacando ese cds completo queda bien: NADA, sigue quedando mal la proteína, y algunas son extra largas con otros dominios en el mismo CDS anotado así que nada
 				$prelength += (int(($subl3[4] - $inicuted)/3))*3;
 			}
 			#elsif ($inicuted < $subl3[3]){
@@ -325,9 +333,10 @@ while (<File>) {
 
 
 			if ($inicuted <= $subl3[4] && $endcuted >= $subl3[3]){
-				$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$endcuted\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
-				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				$endgenereached++;
+				next if ($endcuted >= $inicuted); ## check gene structure
+				$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$endcuted\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				#$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				#if ($inigene == 0 || $inigene )
 			} 
 			elsif ($endcuted >= $subl3[4]){
@@ -341,8 +350,14 @@ while (<File>) {
 				next;
 			}
 			elsif ($inicuted <= $subl3[4] && $endcuted <= $subl3[3]){
-				$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
-				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n"; # Pruebo a ver si sacando ese cds completo queda bien: NADA, sigue quedando mal la proteína, y algunas son extra largas con otros dominios en el mismo CDS anotado así que nada
+				if ($firstcds == 1){ #### not to modify first exon starting in alignment from first position
+					$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+					$firstcds++;
+				} else {
+					$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				}
+				###$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				#$printcds .= "$subl3[0]\tGenomicGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n"; # Pruebo a ver si sacando ese cds completo queda bien: NADA, sigue quedando mal la proteína, y algunas son extra largas con otros dominios en el mismo CDS anotado así que nada
 				$prelength += (int(($inicuted - $subl3[3])/3))*3;
 			}
 			#elsif ($inicuted < $subl3[3]){
@@ -371,7 +386,7 @@ close Results;
 
 #Codify proteins and CDS from the generated GFFs
 
-system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_genomic_genes_trimmed.gff3 $ARGV[3]gffgenomictrimmed");
+system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_annot_genes_trimmed.gff3 $ARGV[3]gfftrimmed");
 
 
 

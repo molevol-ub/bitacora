@@ -182,6 +182,7 @@ while (<File>) {
 
 		my $inigene = 0; my $endgene = 0; my $endgenereached = 0; my $inicuted = 0; my $endcuted = 0;
 		my $prelength = 0; my $precdslength = 0;
+		my $firstcds = $subline[2]; ## Filter to avoid modifying the first cds if the alignment starts from 1 position
 		my $ncds = 1;
 
 		my $ifix = 0;
@@ -245,9 +246,10 @@ while (<File>) {
 
 
 			if ($inicuted >= $subl3[3] && $endcuted <= $subl3[4]){
+				$endgenereached++;
+				next if ($endcuted <= $inicuted); ##Check gene structure
 				$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$inicuted\t$endcuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
-				$endgenereached++;
 				#if ($inigene == 0 || $inigene )
 			} 
 			elsif ($endcuted <= $subl3[3]){
@@ -261,7 +263,13 @@ while (<File>) {
 				next;
 			}
 			elsif ($inicuted >= $subl3[3] && $endcuted >= $subl3[4]){
-				$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$inicuted\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				if ($firstcds == 1){ ## Change to print unmodifyied CDS if alignment starts in 1
+					$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+					$firstcds++;
+				} else {
+					$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$inicuted\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				}
+				###$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$inicuted\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n"; # Pruebo a ver si sacando ese cds completo queda bien: NADA, sigue quedando mal la proteína, y algunas son extra largas con otros dominios en el mismo CDS anotado así que nada
 				$prelength += (int(($subl3[4] - $inicuted)/3))*3;
 			}
@@ -325,9 +333,10 @@ while (<File>) {
 
 
 			if ($inicuted <= $subl3[4] && $endcuted >= $subl3[3]){
+				$endgenereached++;
+				next if ($endcuted >= $inicuted); ## check gene structure
 				$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$endcuted\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
-				$endgenereached++;
 				#if ($inigene == 0 || $inigene )
 			} 
 			elsif ($endcuted >= $subl3[4]){
@@ -341,7 +350,13 @@ while (<File>) {
 				next;
 			}
 			elsif ($inicuted <= $subl3[4] && $endcuted <= $subl3[3]){
-				$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				if ($firstcds == 1){ #### Change to print unmodifyied CDS if alignment starts in 1
+					$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+					$firstcds++;
+				} else {
+					$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
+				}
+				###$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$inicuted\t$subl3[5]\t$subl3[6]\t$subl3[7]\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 				#$printcds .= "$subl3[0]\tAnnotGFF\tCDS\t$subl3[3]\t$subl3[4]\t$subl3[5]\t$subl3[6]\t0\tID=$cdsid;Parent=$subline[0];$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n"; # Pruebo a ver si sacando ese cds completo queda bien: NADA, sigue quedando mal la proteína, y algunas son extra largas con otros dominios en el mismo CDS anotado así que nada
 				$prelength += (int(($inicuted - $subl3[3])/3))*3;
 			}

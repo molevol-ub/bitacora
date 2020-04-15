@@ -215,7 +215,7 @@ foreach my $chem (@chemosensory){
 	# Combining results from blast and hmmer
 
 	system ("cat $chem/$chem\_genomic_genes"."blastp_parsed_list.txt $chem/$chem\_genomic_genes"."hmmer_parsed_list.txt > $chem/$chem\_genomic_genes\_allsearches_list.txt");
-	system ("perl $dirname/get_blast_hmmer_combined.pl $chem/$chem\_genomic_genes_allsearches_list.txt $chem/$chem\_genomic_genes");
+	system ("perl $dirname/get_blast_hmmer_combined_genomicv2.pl $chem/$chem\_genomic_genes_allsearches_list.txt $chem/$chem\_genomic_genes");
 
 	# Obtaining raw original and trimming protein sequences
 
@@ -225,12 +225,12 @@ foreach my $chem (@chemosensory){
 	# Generating a GFF3 for the identified and reannotated (trimmed) proteins
 
 	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_annot_genomic_genes_gff_v2.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
+	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 
 	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem"."gffgenomictrimmed.pep.fasta -out $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 -evalue $evalue -outfmt \"6 std qlen slen\"");
-	system ("perl $dirname/confirm_GFF_proteins.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
+	system ("perl $dirname/confirm_GFF_proteins_withlength.pl $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/$chem\_genomic_protsVsGFF\_blastp\.outfmt6 $chem\/$chem\_genomic");
 
 
 	# Removing putative new sequences already annotated (i.e. duplicated regions due to assembly artifacts)
