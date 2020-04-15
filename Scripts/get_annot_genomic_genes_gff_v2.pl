@@ -85,7 +85,7 @@ while (<File>) {
 			@posorder = sort { $a <=> $b } @positions;
 		} elsif ($subl2[6] =~ /\-/){
 			@posorder = sort { $b <=> $a } @positions;
-		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
 
 		foreach my $posit (@posorder){
 			foreach my $cds (@{$gffcds{$gene}{$posit}}) {
@@ -110,7 +110,7 @@ while (<File>) {
 			@posorder = sort { $a <=> $b } @positions;
 		} elsif ($subl2[6] =~ /\-/){
 			@posorder = sort { $b <=> $a } @positions;
-		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
 
 		foreach my $posit (@posorder){
 			foreach my $cds (@{$gffcds{$gene}{$posit}}) {
@@ -120,7 +120,7 @@ while (<File>) {
 			}
 		}
 
-	} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Protein gene $subline[0] is not found in the GFF3\n";}
+	} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Protein gene $subline[0] is not found in the GFF3\n";}
 	
 }
 close File;
@@ -173,7 +173,7 @@ while (<File>) {
 		$gene = $gene;
 	} elsif (exists $gffgene{$genera}){
 		$gene = $genera;
-	} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Protein gene $gene $subline[0] is not found in the GFF3\n";}
+	} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Protein gene $gene $subline[0] is not found in the GFF3\n";}
 
 
 	my $printcds;
@@ -195,7 +195,7 @@ while (<File>) {
 			@posorder = sort { $a <=> $b } @positions;
 		} elsif ($subl2[6] =~ /\-/){
 			@posorder = sort { $b <=> $a } @positions;
-		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: No forward/reverse in $gffgene{$gene}\n";}
 
 
 
@@ -277,7 +277,7 @@ while (<File>) {
 			#	die "$inicuted menor que $subl3[3] en  get_annot_genes_gff.pl\n$line\n$cds\n";
 			#}
 			else {
-				die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Debugging control: Incongruence observed in (some situation not considered):\n$line\n$cds\n";
+				die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Debugging control: Incongruence observed in (some situation not considered):\n$line\n$cds\n";
 			}
 
 		}
@@ -364,19 +364,19 @@ while (<File>) {
 			#	die "$inicuted menor que $subl3[3] en  get_annot_genes_gff.pl\n$line\n$cds\n";
 			#}
 			else {
-				die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Debugging control: Incongruence observed in (some situation not considered):\n$line\n$cds\ninicuted:$inicuted\nendcuted:$endcuted\n";
+				die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Debugging control: Incongruence observed in (some situation not considered):\n$line\n$cds\ninicuted:$inicuted\nendcuted:$endcuted\n";
 			}
 
 		}
 		}
-		} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Cant't find strand in GFF3: $gffgene{$gene}\n";}
+		} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Cant't find strand in GFF3: $gffgene{$gene}\n";}
 
 
 		print Results "$subl2[0]\tGenomicGFF\tgene\t$inigene\t$endgene\t$subl2[5]\t$subl2[6]\t$subl2[7]\tID=$geneparent;$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 		print Results "$subl2[0]\tGenomicGFF\tmRNA\t$inigene\t$endgene\t$subl2[5]\t$subl2[6]\t$subl2[7]\tID=$subline[0];Parent=$geneparent;$subline[4];$subline[1];Pos:$subline[2]-$subline[3]\n";
 		print Results "$printcds";
 
-	} else {die "ERROR in $dirname/get_annot_genes_gff_v2.pl: Protein gene $gene $subline[0] is not found in the GFF3\n";}
+	} else {die "ERROR in $dirname/get_annot_genomic_genes_gff_v2.pl: Protein gene $gene $subline[0] is not found in the GFF3\n";}
 	
 }
 close File;
@@ -386,7 +386,7 @@ close Results;
 
 #Codify proteins and CDS from the generated GFFs
 
-system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_annot_genes_trimmed.gff3 $ARGV[3]gfftrimmed");
+system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_genomic_genes_trimmed.gff3 $ARGV[3]gffgenomictrimmed");
 
 
 
