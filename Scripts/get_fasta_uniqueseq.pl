@@ -88,7 +88,7 @@ while (<Fasta>) {
 }
 close Fasta;
 
-foreach my $key (keys %nrfa){
+foreach my $key (sort keys %nrfa){
 	my $nkey = $key;
 	#$nkey =~ s/\_//g;
 	#$nkey =~ s/\.//g;

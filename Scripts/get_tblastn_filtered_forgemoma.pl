@@ -10,8 +10,10 @@ my ($line, $name, $nameout);
 my (%blast, %fasta, %hits);
 my %hitpos;
 
+system ("sort -V -k 1 $ARGV[0] > $ARGV[0]\_sorted.txt");
+
 open (Results, ">", "$ARGV[0]\_filtered.txt");
-open (Blastfile , "<", $ARGV[0]); 
+open (Blastfile , "<", "$ARGV[0]\_sorted.txt"); 
 while (<Blastfile>) {
 	chomp;
 	$line = $_;

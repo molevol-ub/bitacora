@@ -154,7 +154,7 @@ foreach my $chem (@chemosensory){
 	}
 	close FileGemo;
 	if ($gemoerr > 0){
-		die "ERROR in $dirname/runanalysis_2ndroung_genomic_withgff_gemoma: GeMoMa died with error running GeMoMa\n";
+		die "ERROR in $dirname/runanalysis_2ndround_v2_genomic_nogff_gemoma: GeMoMa died with error running GeMoMa\n";
 	}
 
 	## Filtering annotations
@@ -175,7 +175,7 @@ foreach my $chem (@chemosensory){
 	}
 	close FileGemo;
 	if ($gemoerr > 0){
-		die "ERROR in $dirname/runanalysis_2ndroung_genomic_withgff_gemoma: GeMoMa died with error runnning GAF\n";
+		die "ERROR in $dirname/runanalysis_2ndround_v2_genomic_nogff_gemoma: GeMoMa died with error runnning GAF\n";
 	}
 
 
@@ -195,7 +195,7 @@ foreach my $chem (@chemosensory){
 	}
 	close FileGemo;
 	if ($gemoerr > 0){
-		die "ERROR in $dirname/runanalysis_2ndroung_genomic_withgff_gemoma: GeMoMa died with error running AF\n";
+		die "ERROR in $dirname/runanalysis_2ndround_v2_genomic_nogff_gemoma: GeMoMa died with error running AF\n";
 	}
 
 
