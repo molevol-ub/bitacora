@@ -104,20 +104,21 @@ foreach my $chem (@chemosensory){
 
 	# run tblastn (outfmt6 with fields for GeMoMa)
 	print "Doing $chem tblastn\n";
-	system ("tblastn -query $chem\/$chem\_db_masannot_filt.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sallseqid score nident positive gaps ppos qframe sframe qseq sseq qlen slen salltitles\" -evalue $evalue -num_threads $threads");
-	#system ("tblastn -query $chem\/$chem\_db_masannot.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std sframe qlen slen\"");
+	#system ("tblastn -query $chem\/$chem\_db_masannot_filt.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sallseqid score nident positive gaps ppos qframe sframe qseq sseq qlen slen salltitles\" -evalue $evalue -num_threads $threads");
+	system ("perl $dirname/run_parallel_tblastn_gemoma.pl $chem\/$chem\_db_masannot_filt.fasta $genome $threads $evalue $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
 
 	# Parsing tblastn output
 	print "Parsing $chem tblastn\n";
+	
+	# Step moved after filtering the tblastn file, it runs faster
+	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
+	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
 
-	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
-	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
-	system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
-	system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
+	# Filter tblastn file to exclude hits in same scaffold positions that cause errors in gemoma
+	system ("perl $dirname/get_tblastn_filtered_forgemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
 
-	# (Not necessary) New parsing for GeMoMa (output outfmt6 collapsing hits (1 hit per exon), and filtering for novel not annotated exons in GFF, or GFF unfiltered)
-	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff_genomic_positions_gemomaout.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $gfffile $evalue");
-	#system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions_gemomaout.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6 $chem/$chem $evalue");
+	system ("perl $dirname/get_genomic_tblastn_parsed_newv_gff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt $chem/$chem $gfffile $evalue");
+	system ("perl $dirname/get_genomic_tblastn_parsed_newv_nogff_genomic_positions_gemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt $chem/$chem $evalue");
 
 
 	###### Exiting if no novel genes are found
@@ -212,8 +213,16 @@ foreach my $chem (@chemosensory){
 
 	system ("mkdir -p $chem/gemoma_outdir");
 
-	# Filter tblastn file to exclude hits in same scaffold positions that cause errors in gemoma
-	system ("perl $dirname/get_tblastn_filtered_forgemoma.pl $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
+	# Detect GeMoMa version
+	my $gemomaversion = "0";
+	open (Gemvfile, "<", "GeMoMa_version.txt");
+	while (<Gemvfile>){
+		chomp;
+		my $gemovline = $_;
+		next if ($gemovline !~ /\S+/);
+		$gemomaversion = $gemovline;
+	}
+	close Gemvfile;
 
 	system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_masannot_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
 
@@ -256,8 +265,14 @@ foreach my $chem (@chemosensory){
 	}
 
 
-	system ("java -jar $gemomap CLI AnnotationFinalizer a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");
-	
+	# AnnotationFinalizer, the parameters differ between versions
+
+	if ($gemomaversion > 163){
+		system ("java -jar $gemomap CLI AnnotationFinalizer g=$genome a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	} else {
+		system ("java -jar $gemomap CLI AnnotationFinalizer a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");	
+	}
+
 	# Check if GeMoMa finished without errors
 	$gemoerr = "0";
 	open (FileGemo, "<", "$chem\/gemoma.err");

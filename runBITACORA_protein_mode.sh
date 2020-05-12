@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.2
+VERSION=1.2.1
 
 ##########################################################
 ##              EXPORT EXECUTABLES TO PATH              ##
@@ -57,6 +57,10 @@ EVALUE=1e-3
 # Number of threads to be used in blast searches
 THREADS=1
 
+# An additional validation and filtering of the resulting annotations can be conducted using the option ADDFILTER. 
+# If ADDFILTER=T, BITACORA will cluster highly similar sequences (with 98% identity; being isoforms or resulting from putative assembly artifacts), and will discard all annotations with a length lower than the specified in FILTERLENGTH parameter.
+ADDFILTER=T
+FILTERLENGTH=30
 
 ##########################################################
 ##                      HOW TO RUN                      ##
@@ -105,6 +109,21 @@ if [ $ERRORCHECK != 0 ]; then
 fi
 
 ERRORCHECK="$(grep -c 'Segmentation' BITACORAstd.err)"
+
+if [ $ERRORCHECK != 0 ]; then
+	cat BITACORAstd.err;
+	echo -e "BITACORA died with error\n";
+	exit 1;
+fi
+
+
+# Run additional filtering and clustering
+	
+if [ $ADDFILTER == "T" ] ; then
+	perl $SCRIPTDIR/runfiltering_protein_mode.pl $NAME $QUERYDIR $FILTERLENGTH 2>>BITACORAstd.err 2>BITACORAstd.err
+fi
+
+ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
 
 if [ $ERRORCHECK != 0 ]; then
 	cat BITACORAstd.err;

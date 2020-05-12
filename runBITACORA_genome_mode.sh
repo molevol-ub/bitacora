@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.2
+VERSION=1.2.1
 
 ##########################################################
 ##              EXPORT EXECUTABLES TO PATH              ##
@@ -71,6 +71,11 @@ MAXINTRON=15000
 # Set GENOMICBLASTP=T in order to conduct both BLASTP and HMMER to curate novel annotated genes (Note that this option is the most sensitive but greatly depends on the database quality and could result in false positives) 
 # Otherwise, BITACORA will only use the protein domain (HMMER) to validate new annotated genes (In this case, the probability of detecting all copies is lower, but it will avoid to identify unrelated genes)
 GENOMICBLASTP=F
+
+# An additional validation and filtering of the resulting annotations can be conducted using the option ADDFILTER. 
+# If ADDFILTER=T, BITACORA will cluster highly similar sequences (with 98% identity; being isoforms or resulting from putative assembly artifacts), and will discard all annotations with a length lower than the specified in FILTERLENGTH parameter.
+ADDFILTER=T
+FILTERLENGTH=30
 
 ##########################################################
 ##                      HOW TO RUN                      ##
@@ -144,6 +149,21 @@ if [ $ERRORCHECK != 0 ]; then
 fi
 
 ERRORCHECK="$(grep -c 'Segmentation' BITACORAstd.err)"
+
+if [ $ERRORCHECK != 0 ]; then
+	cat BITACORAstd.err;
+	echo -e "BITACORA died with error\n";
+	exit 1;
+fi
+
+
+# Run additional filtering and clustering
+	
+if [ $ADDFILTER == "T" ] ; then
+	perl $SCRIPTDIR/runfiltering_genome_mode.pl $NAME $QUERYDIR $FILTERLENGTH 2>>BITACORAstd.err 2>BITACORAstd.err
+fi
+
+ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
 
 if [ $ERRORCHECK != 0 ]; then
 	cat BITACORAstd.err;

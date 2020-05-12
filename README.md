@@ -6,12 +6,13 @@
 Genome annotation is a critical bottleneck in genomic research, especially for the comprehensive study of gene families in the genomes of non-model organisms. Despite the recent progress in automatic annotation, state-of-the-art tools used for this task often produce inaccurate annotations, such as fused, chimeric, partial or even completely absent gene models for many family copies, errors that require considerable extra efforts to be corrected. Here we present BITACORA, a bioinformatics tool that integrates popular sequence similarity-based search algorithms and Perl scripts to facilitate the curation of these inaccurate annotations and the identification of previously undetected gene family copies directly from genomic DNA sequences. The program creates general feature format (GFF) files, with both curated and newly identified gene models, and FASTA files with all predicted proteins. The output of BITACORA can be easily integrated in genomic annotation editors, greatly facilitating subsequent manual annotation and downstream analyses.
 
 
-BITACORA up-to-date documentation can be found in: http://www.ub.edu/softevol/bitacora/
+BITACORA up-to-date documentation can be also be found in: http://www.ub.edu/softevol/bitacora/
 
 
-New version 1.2:
-- Implementation of GeMoMa algorithm to reconstruct new gene models (set as default)
+New version 1.2.1:
+- Implementation of GeMoMa algorithm to reconstruct new gene models (set as default). Latest version tested and working in our pipeline is GeMoMa v1.6.4.
 - New parameter that allows retaining novel proteins based on HMMER or BLASTP positive hits
+- Additional step to conduct a more strict filtering of the output annotations in order to obtain a confident estimation on the number of gene members for a specific gene family.
 
 
 ## 0. Contents

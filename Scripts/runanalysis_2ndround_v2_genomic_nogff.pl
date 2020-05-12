@@ -91,7 +91,9 @@ foreach my $chem (@chemosensory){
 
 	# run tblastn
 	print "Doing $chem tblastn\n";
-	system ("tblastn -query $chemdir\/$chem\_db.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads");
+	system ("cp $chemdir\/$chem\_db.fasta $chem\/$chem\_db.fasta");	
+	#system ("tblastn -query $chemdir\/$chem\_db.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads"); # Deprecated
+	system ("perl $dirname/run_parallel_tblastn.pl $chem\/$chem\_db.fasta $genome $threads $evalue $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
 
 	# Parsing tblastn output
 	print "Parsing $chem tblastn\n";
@@ -150,13 +152,13 @@ foreach my $chem (@chemosensory){
 
 	# Obtaining raw original and trimming protein sequences
 
-	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
+	system ("perl $dirname/get_fasta_fromalist_v2.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem\_genomic\_genes_hmmerparsed"); 
+	system ("perl $dirname/get_genomic_fasta_trimmed.pl $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem/$chem\_genomic_genes_hmmerparsed"); 
 
 	# Generating a GFF3 for the identified and reannotated (trimmed) proteins
 
 	system("perl $dirname/get_genomic_gff.pl $chem/$chem\_genomic_genes_proteins.fasta $chem/$chem"."tblastn_parsed_list_genomic_positions_nogff_filtered.txt $chem/$chem $genome"); # Getting GFF3 from genomic sequences, although it is very raw and should be edited after manually filtering, or via Apollo
-	system ("perl $dirname/get_annot_genomic_genes_gff_v2.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
+	system ("perl $dirname/get_genomic_gff_filtered_trimmed.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
 

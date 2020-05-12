@@ -111,18 +111,30 @@ print "BLAST installed correctly\n";
 
 if ($gemoma =~ /T/){
 	my $gpath = $ARGV[3];
-	system ("java -jar $gpath CLI GeMoMa info > testGemoma.out 2> testGemoma.err");
+	system ("java -jar $gpath CLI > testGemoma.out 2> testGemoma.err");
 	my $gemerr = 0;
-	#open (File, "<", "testGemoma.err");
-	#while(<File>){
-	#	chomp;
-	#	$line = $_;
-	#	next if ($line !~ /\S+/);	
-	#	if ($line =~ /Unable/){
+	my $gemomav = "0";
+	my $tempv = "";
+	open (File, "<", "testGemoma.err");
+	while(<File>){
+		chomp;
+		$line = $_;
+		next if ($line !~ /\S+/);	
+		if ($line =~ /Unable/){
 	#		$gemerr++;
-	#	}
-	#}
-	#close File;
+		}
+		if ($line =~ /(GeMoMa\-\S+).jar/){
+			$tempv = $1;
+			if ($tempv =~ /GeMoMa\-(\d)\.(\d)\.(\d)/){
+				$gemomav = "$1"."$2"."$3";
+			} elsif ($tempv =~ /GeMoMa\-(\d)\.(\d)/){
+				$gemomav = "$1"."$2"."0";
+			} elsif ($tempv =~ /GeMoMa\-(\d)/){
+				$gemomav = "$1"."0"."0";
+			}
+		}
+	}
+	close File;
 	my $gemok = 0;
 	open (File, "<", "testGemoma.out");
 	while(<File>){
@@ -141,8 +153,22 @@ if ($gemoma =~ /T/){
 		die "ERROR in $dirname/check_data.pl: GeMoMa could not be found\nAre you sure you set the path to GeMoMa jar file correctly and java is installed in your system?\n";
 	}
 
-	print "GeMoMa installed correctly\n";
+	if ($gemomav > 100){
+		#OK
+	} else {
+		die "ERROR in $dirname/check_data.pl: GeMoMa version $tempv could not be assessed\nAre you sure you are using a version of GeMoMa tested and working in BITACORA? Check the latest supported version in the readme\n";
+	}
+	if ($gemomav < 164){
+		die "ERROR in $dirname/check_data.pl: An old version of GeMoMa has been detected $tempv\nPlease download a more recent version (at least GeMoMa-1.6.4)\n";
+	}
+
+	print "$tempv is installed correctly\n";
+
+	open (Gemfile, ">", "GeMoMa_version.txt");
+	print Gemfile "$gemomav\n";
+	close Gemfile;
 }
+
 
 
 # Check if the query dir contains proper renamed fasta and HMM files

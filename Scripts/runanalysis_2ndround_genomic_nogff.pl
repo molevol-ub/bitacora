@@ -90,7 +90,9 @@ foreach my $chem (@chemosensory){
 
 	# run tblastn
 	print "Doing $chem tblastn\n";
-	system ("tblastn -query $chemdir\/$chem\_db.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads");
+	system ("cp $chemdir\/$chem\_db.fasta $chem\/$chem\_db.fasta");
+	#system ("tblastn -query $chemdir\/$chem\_db.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads"); # Deprecated
+	system ("perl $dirname/run_parallel_tblastn.pl $chem\/$chem\_db.fasta $genome $threads $evalue $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
 
 	# Parsing tblastn output
 	print "Parsing $chem tblastn\n";

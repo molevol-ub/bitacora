@@ -48,3 +48,5 @@ while (<Blastfile>) {
 close Blastfile;
 close Results;
 
+system ("rm $ARGV[0]\_sorted.txt");
+

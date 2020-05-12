@@ -41,8 +41,10 @@ foreach my $chem (@chemosensory){
 	system("mv $chem\/Intermediate_files/*bed $chem\/");
 	system("mv $chem\/Intermediate_files/*genomic_and_annotated* $chem\/");
 
-}
+	system ("rm -rf $chem\/*_renamed\.fasta $chem\/*\.fasta\.* 2>/dev/null");
 
+}
+#system ("rm -rf GeMoMa_version.txt 2>/dev/null");
 
 
 

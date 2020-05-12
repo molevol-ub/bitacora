@@ -94,7 +94,8 @@ foreach my $chem (@chemosensory){
 
 	# run tblastn
 	print "Doing $chem tblastn\n";
-	system ("tblastn -query $chem\/$chem\_db_masannot.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads ");
+	#system ("tblastn -query $chem\/$chem\_db_masannot.fasta -db $genome -out $chem\/$name\_Vs$chem\_tblastn\.outfmt6 -outfmt \"6 std sframe qlen slen\" -evalue $evalue -num_threads $threads "); # Deprecated
+	system ("perl $dirname/run_parallel_tblastn.pl $chem\/$chem\_db_masannot.fasta $genome $threads $evalue $chem\/$name\_Vs$chem\_tblastn\.outfmt6");
 
 	# Parsing tblastn output
 	print "Parsing $chem tblastn\n";
@@ -248,7 +249,7 @@ foreach my $chem (@chemosensory){
 		chomp;
 		my $line = $_;
 		my @subline = split (/\t/, $line);
-		next if ($subline[2] < 90); # ID at least of 90% to consider it as a duplicate artifact
+		next if ($subline[2] < 95); # ID at least of 90% to consider it as a duplicate artifact
 		if (exists $blast_relation{$subline[1]}){
 			next if ($blast_relation{$subline[1]} =~ /$subline[0] /);
 		}
@@ -283,13 +284,14 @@ foreach my $chem (@chemosensory){
 	close ResultsNotannot;
 	#print "Doing $chem blast genomic proteins vs all anotated proteins\n";
 	system ("blastp -query $chem/$chem\_genomic_not_$chem\_annotated\_proteins_trimmed.fasta -db $transcripts -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -num_threads $threads -out $chem/$chem\_genomicnotAnnotVsAllproteome.outfmt6");
+	#system ("perl $dirname/run_parallel_blastp.pl $chem/$chem\_genomic_not_$chem\_annotated\_proteins_trimmed.fasta $transcripts $threads 1e-5 $chem/$chem\_genomicnotAnnotVsAllproteome.outfmt6");
 	open (Blast, "<", "$chem/$chem\_genomicnotAnnotVsAllproteome.outfmt6");
 	my $deletedgenomic = 0;
 	while (<Blast>){
 		chomp;
 		my $line = $_;
 		my @subline = split (/\t/, $line);
-		next if ($subline[2] < 90);
+		next if ($subline[2] < 95);
 		if (exists $fasta_genomic{$subline[0]}){
 			delete $fasta_genomic{$subline[0]};
 			$deletedgenomic++;

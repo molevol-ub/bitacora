@@ -2,21 +2,21 @@
 
 ##########################################################
 ##                                                      ##
-##                       BITACORA						##
-##														##
-##      	Bioinformatics tool to assist the 			##
-## 		comprehensive annotation of gene families		##
-##                                         				##
-##											            ##
+##                       BITACORA                       ##
+##                                                      ##
+##          Bioinformatics tool to assist the           ##
+##      comprehensive annotation of gene families       ##
+##                                                      ##
+##                                                      ##
 ## Developed by Joel Vizueta                            ##
 ## Contact: via github or jvizueta@ub.edu               ##
 ##                                                      ##
 ##########################################################
 
-VERSION=1.2
+VERSION=1.2.1
 
 ##########################################################
-##    		   EXPORT EXECUTABLES TO PATH 				##
+##              EXPORT EXECUTABLES TO PATH              ##
 ##########################################################
 
 # Perl needs to be installed in the system
@@ -25,11 +25,15 @@ VERSION=1.2
 export PATH=$PATH:/path/to/blast/bin
 export PATH=$PATH:/path/to/hmmer/bin
 
-# (Optional) In case of using GeMoMa, specify the PATH to jar file
+# PATH to BITACORA Scripts folder. 
+SCRIPTDIR=/path/to/Scripts
+
+# In case of using GeMoMa (set as default), specify the PATH to jar file. Otherwise, set GEMOMA=F in editable parameters section to use the close-proximity method, which does not require any external software
 GEMOMAP=/path/to/GeMoMa.jar
 
+
 ##########################################################
-##                  PREPARE THE DATA 					##
+##                   PREPARE THE DATA                   ##
 ##########################################################
 
 # Include here the name of your species. i.e. NAME=Dmel
@@ -50,25 +54,24 @@ PROTFILE=Files/Drosophila_melanogaster.BDGP6.95.chromosome.2R.pep.fasta
 QUERYDIR=DB
 
 
-
 ##########################################################
-##         		    EDITABLE PARAMETERS					##
+##                 EDITABLE PARAMETERS                  ##
 ##########################################################
 
-# Set CLEAN=T if you want to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the output folder
+# Set CLEAN=T if you want to clean the output folder. Intermediate files will not be erased but saved in the Intermediate_files folder. Otherwise, set CLEAN=F to keep all files in the same output folder
 CLEAN=T
 
 # You can modify the E-value used to filter BLAST and HMMER. Default is 1e-5
 EVALUE=1e-3
 
 # Number of threads to be used in blast searches
-THREADS=2
+THREADS=1
 
-# (Recommended) Set GEMOMA=T (with upper case) if you want to use this software to predict novel genes from tblastn alignments (PATH to jar file need to be specified in GEMOMAP variable) 
-# Otherwise, BITACORA will predict new genes by exon proximity
-GEMOMA=F
+# (Default) GEMOMA=T (with upper case) will use GeMoMa software to predict novel genes from TBLASTN alignments (PATH to jar file need to be specified in GEMOMAP variable) 
+# Otherwise, set GEMOMA=F to predict new genes by exon proximity (close-proximity method)
+GEMOMA=T
 
-# (Used when GEMOMA=F) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Xdom) 
+# (Used when GEMOMA=F; close-proximity method) Maximum length of an intron used to join putative exons of a gene. Default value is conservative and can also join exons from different genes (labeled in output files with _Ndom) 
 # The provided script in Scripts/Tools/get_intron_size_fromgff.pl can estimate intron length statistics for a specific GFF. See the manual for more details
 MAXINTRON=15000
 
@@ -76,10 +79,13 @@ MAXINTRON=15000
 # Otherwise, BITACORA will only use the protein domain (HMMER) to validate new annotated genes (In this case, the probability of detecting all copies is lower, but it will avoid to identify unrelated genes)
 GENOMICBLASTP=F
 
-
+# An additional validation and filtering of the resulting annotations can be conducted using the option ADDFILTER. 
+# If ADDFILTER=T, BITACORA will cluster highly similar sequences (with 98% identity; being isoforms or resulting from putative assembly artifacts), and will discard all annotations with a length lower than the specified in FILTERLENGTH parameter.
+ADDFILTER=T
+FILTERLENGTH=30
 
 ##########################################################
-##         		       HOW TO RUN						##
+##                      HOW TO RUN                      ##
 ##########################################################
 
 # Once you have included all of the above variables, you can run BITACORA as in:
@@ -154,7 +160,6 @@ if [ $GEMOMA != "T" ] ; then
 	fi
 fi
 
-
 ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
 
 if [ $ERRORCHECK != 0 ]; then
@@ -164,6 +169,21 @@ if [ $ERRORCHECK != 0 ]; then
 fi
 
 ERRORCHECK="$(grep -c 'Segmentation' BITACORAstd.err)"
+
+if [ $ERRORCHECK != 0 ]; then
+	cat BITACORAstd.err;
+	echo -e "BITACORA died with error\n";
+	exit 1;
+fi
+
+
+# Run additional filtering and clustering
+	
+if [ $ADDFILTER == "T" ] ; then
+	perl $SCRIPTDIR/runfiltering.pl $NAME $QUERYDIR $FILTERLENGTH 2>>BITACORAstd.err 2>BITACORAstd.err
+fi
+
+ERRORCHECK="$(grep -c 'ERROR' BITACORAstd.err)"
 
 if [ $ERRORCHECK != 0 ]; then
 	cat BITACORAstd.err;

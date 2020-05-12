@@ -11,7 +11,6 @@ my $dirname = dirname(__FILE__);
 # usage: perl Scripts/check_data.pl $gff $genome $proteins query_directory
 
 
-
 my ($line, $name, $nameout);
 my $gff = $ARGV[0];
 my $genome = $ARGV[1];
@@ -28,6 +27,21 @@ my %gffcds = %$gffcdsref;
 my %gffgene = %$gffgeneref;
 my %gffscafcds = %$gffscafcdsref;
 
+## Checking if GFF contains overlapped genes (i.e. isoforms or bad-annotations)
+
+my $overlapped = "0";
+system("perl $dirname/Tools/get_overlapping_genes_fromgff.pl $gff");
+open (Ofile, "<", "$gff\_overlapping_genes.txt");
+while (<Ofile>){
+	chomp;
+	$line = $_;
+	next if ($line !~ /\S+/);
+	$overlapped++;
+}
+close Ofile;
+if ($overlapped > 0	){
+	print "\nWarning: The input GFF contains coding sequences in overlapping positions (such as isoforms). BITACORA will continue running but take into account that the final annotation will include all isoforms included in the input GFF and protein fasta files (ignore this message if the input protein fasta contains one representative sequence per gene)\nYou can check the overlapping genes in file $gff\_overlapping_genes.txt\n\n";
+}
 
 print "GFF parsed correctly\n";
 
@@ -186,18 +200,30 @@ print "BLAST installed correctly\n";
 
 if ($gemoma =~ /T/){
 	my $gpath = $ARGV[5];
-	system ("java -jar $gpath CLI GeMoMa info > testGemoma.out 2> testGemoma.err");
+	system ("java -jar $gpath CLI > testGemoma.out 2> testGemoma.err");
 	my $gemerr = 0;
-	#open (File, "<", "testGemoma.err");
-	#while(<File>){
-	#	chomp;
-	#	$line = $_;
-	#	next if ($line !~ /\S+/);	
-	#	if ($line =~ /Unable/){
+	my $gemomav = "0";
+	my $tempv = "";
+	open (File, "<", "testGemoma.err");
+	while(<File>){
+		chomp;
+		$line = $_;
+		next if ($line !~ /\S+/);	
+		if ($line =~ /Unable/){
 	#		$gemerr++;
-	#	}
-	#}
-	#close File;
+		}
+		if ($line =~ /(GeMoMa\-\S+).jar/){
+			$tempv = $1;
+			if ($tempv =~ /GeMoMa\-(\d)\.(\d)\.(\d)/){
+				$gemomav = "$1"."$2"."$3";
+			} elsif ($tempv =~ /GeMoMa\-(\d)\.(\d)/){
+				$gemomav = "$1"."$2"."0";
+			} elsif ($tempv =~ /GeMoMa\-(\d)/){
+				$gemomav = "$1"."0"."0";
+			}
+		}
+	}
+	close File;
 	my $gemok = 0;
 	open (File, "<", "testGemoma.out");
 	while(<File>){
@@ -216,7 +242,20 @@ if ($gemoma =~ /T/){
 		die "ERROR in $dirname/check_data.pl: GeMoMa could not be found\nAre you sure you set the path to GeMoMa jar file correctly and java is installed in your system?\n";
 	}
 
-	print "GeMoMa installed correctly\n";
+	if ($gemomav > 100){
+		#OK
+	} else {
+		die "ERROR in $dirname/check_data.pl: GeMoMa version $tempv could not be assessed\nAre you sure you are using a version of GeMoMa tested and working in BITACORA? Check the latest supported version in the readme\n";
+	}
+	if ($gemomav < 164){
+		die "ERROR in $dirname/check_data.pl: An old version of GeMoMa has been detected $tempv\nPlease download a more recent version (at least GeMoMa-1.6.4)\n";
+	}	
+
+	print "$tempv is installed correctly\n";
+
+	open (Gemfile, ">", "GeMoMa_version.txt");
+	print Gemfile "$gemomav\n";
+	close Gemfile;
 }
 
 

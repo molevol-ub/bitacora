@@ -64,6 +64,7 @@ sub readgff {
 			
 		}
 		elsif ($subline[2] =~ /mRNA/ || $subline[2] =~ /transcript/){
+			next if ($subline[2] =~ /transcriptional/);
 			my $genename = "";
 			if ($subline[8] =~ /ID=([^;]+)/){
 			#if ($subline[8] =~ /(transcript_id|Transcript) \"([^"]+)\"/){  # Example to use in GTF formats. Uncomment this line (delete #) and comment previous line

@@ -10,7 +10,7 @@ my ($name, $line, $nameout, $contig, $frame, $name2);
 my (%nrfa, %inicio, %fin, %fastacutted, %fastanames);
 my $skip = 0;
 my $ids = "";
-
+my $numseqsinput = 0;
 
 # read and print fasta with one seq per line
 open (Res, ">", "$ARGV[1]\.tmp");
@@ -23,7 +23,14 @@ while (<Fasta>) {
 	next if ($line !~ /\S+/);
 	if ($line =~ /^>(\S+)/) {
 		$name = $1;
+		$numseqsinput++;
+		if (exists $fasta{$name}){
+			$skip = 1;
+		} else {
+			$skip = 0;
+		}
 	} else {
+		next if ($skip == 1);
 		$fasta{$name} .= $line;
 	}
 }
@@ -34,8 +41,13 @@ foreach my $key (sort keys %fasta){
 }
 close Res;
 
+if ($numseqsinput > 20000){
+	print "Warning, you input database contains more that 20,000 protein sequences. This may take a while..\n";
+}
 
 # delete repeated seqs
+
+$skip = 0;
 
 open (Results, ">", "$ARGV[1]");
 
@@ -54,6 +66,10 @@ while (<Fasta>) {
 	}
 	else {
 		next if ($skip == 1);
+		if ($numseqsinput > 20000){
+			$nrfa{$name} = $line;
+			next;
+		}
 
 			my $match = "0";
 			my $hit = "";

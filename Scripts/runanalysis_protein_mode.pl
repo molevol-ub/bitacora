@@ -72,7 +72,10 @@ foreach my $chem (@chemosensory){
 	system ("mkdir -p $chem");
 	# run blastp
 	print "Doing $chem blastp\n";
-	system ("blastp -query $chemdir\/$chem\_db\.fasta -db $transcripts -out $chem\/$name\_Vs$chem\_blastp\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std qlen slen\" ");
+	system ("cp $chemdir\/$chem\_db.fasta $chem\/$chem\_db.fasta");
+	#system ("blastp -query $chemdir\/$chem\_db\.fasta -db $transcripts -out $chem\/$name\_Vs$chem\_blastp\.outfmt6 -evalue $evalue -num_threads $threads -outfmt \"6 std qlen slen\" "); # Deprecated
+	system ("perl $dirname/run_parallel_blastp.pl $chem\/$chem\_db\.fasta $transcripts $threads $evalue $chem\/$name\_Vs$chem\_blastp\.outfmt6");
+
 	# run hmmer
 	system ("mkdir -p $chem\/hmmer");
 	print "Doing $chem hmmer\n";

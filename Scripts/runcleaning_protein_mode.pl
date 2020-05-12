@@ -38,7 +38,9 @@ foreach my $chem (@chemosensory){
 
 	# Moving Files
 	system("mv $chem\/* $chem\/Intermediate_files/ 2>/dev/null");
-	system("mv $chem\/Intermediate_files/*proteins_trimmed.fasta $chem\/");
+	system("mv $chem\/Intermediate_files/*proteins_trimmed* $chem\/");
+
+	system ("rm -rf $chem\/*_renamed\.fasta $chem\/*\.fasta\.* 2>/dev/null");
 
 }
 
