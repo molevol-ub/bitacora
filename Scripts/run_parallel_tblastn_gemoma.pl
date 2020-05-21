@@ -37,6 +37,11 @@ while (<File>){
 }
 close File;
 
+if ($numseq < $nthreads){
+	exec("tblastn -query $query -db $database -out $outfile -outfmt \"6 std sallseqid score nident positive gaps ppos qframe sframe qseq sseq qlen slen salltitles\" -evalue $eval");
+	exit;
+}
+
 $seqsperfile = int($numseq/$nthreads + 0.5);
 
 # Split fasta

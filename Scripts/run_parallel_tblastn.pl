@@ -37,6 +37,11 @@ while (<File>){
 }
 close File;
 
+if ($numseq < $nthreads){	
+	system ("tblastn -query $query -db $database -out $outfile -outfmt \"6 std sframe qlen slen\" -evalue $eval");
+	exit;
+}
+
 $seqsperfile = int($numseq/$nthreads + 0.5);
 
 # Split fasta

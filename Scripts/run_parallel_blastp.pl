@@ -37,6 +37,11 @@ while (<File>){
 }
 close File;
 
+if ($numseq < $nthreads){
+	system ("blastp -query $query -db $database -out $outfile -outfmt \"6 std qlen slen\" -evalue $eval");
+	exit;
+}
+
 $seqsperfile = int($numseq/$nthreads + 0.5);
 
 # Split fasta
