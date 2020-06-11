@@ -126,7 +126,7 @@ foreach my $chem (@chemosensory){
 	close File;
 
 	if ($count == 0){
-		print Chemcounts "$chem 0 0 0\n";
+		print Chemcounts "$chem\t0\t0\t0\n";
 	}
 	else {
 		my $medialength = int($cutlength/$count);

@@ -287,6 +287,9 @@ while (<File>) {
 			} 
 			if ($endgenereached == 0){
 				$inigene = $endcuted;
+				if ($inigene < 1){ # Avoid negative values when trimming genes
+					$inigene = 1;
+				}				
 			}
 
 

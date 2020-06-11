@@ -8,6 +8,7 @@ Genome annotation is a critical bottleneck in genomic research, especially for t
 
 BITACORA up-to-date documentation can be also be found in: http://www.ub.edu/softevol/bitacora/
 
+- Added a new script to call BITACORA with command line options (run first '$ chmod +x runBITACORA_command_line.sh' to make it executable, and '$ ./runBITACORA_command_line.sh -h' to see the available options)
 
 New version 1.2.1:
 - Implementation of GeMoMa algorithm to reconstruct new gene models (set as default). The latest version tested in our pipeline is GeMoMa v1.6.4.
@@ -287,7 +288,7 @@ $ bash runBITACORA.sh
 ## 9. Citation
 
 
-Joel Vizueta, Alejandro Sánchez-Gracia, and Julio Rozas. 2019. BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. bioRxiv. https://doi.org/10.1101/593889
+Joel Vizueta, Alejandro Sánchez-Gracia, Julio Rozas. BITACORA: A comprehensive tool for the identification and annotation of gene families in genome assemblies. Molecular Ecology Resources, 2020. https://doi.org/10.1111/1755-0998.13202
 
 Joel Vizueta, Julio Rozas, Alejandro Sánchez-Gracia; Comparative Genomics Reveals Thousands of Novel Chemosensory Genes and Massive Changes in Chemoreceptor Repertories across Chelicerates, Genome Biology and Evolution, Volume 10, Issue 5, 1 May 2018, Pages 1221–1236, https://doi.org/10.1093/gbe/evy081
 

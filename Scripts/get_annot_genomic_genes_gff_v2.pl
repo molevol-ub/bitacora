@@ -324,6 +324,9 @@ while (<File>) {
 			} 
 			if ($endgenereached == 0){
 				$inigene = $endcuted;
+				if ($inigene < 1){ # Avoid negative values when trimming genes
+					$inigene = 1;
+				}
 			}
 
 
@@ -384,7 +387,7 @@ close File;
 close Results;
 
 
-#Codify proteins and CDS from the generated GFFs
+#Encode proteins and CDS from the generated GFFs
 
 system ("perl $dirname/gff2fasta_v3.pl $genome $ARGV[3]\_genomic_genes_trimmed.gff3 $ARGV[3]gffgenomictrimmed");
 
