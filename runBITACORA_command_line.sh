@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.2.1
+VERSION=1.3
 
 # Default values for editable parameters
 CLEAN=T
@@ -157,8 +157,8 @@ else
 	exit 1;
 fi
 
-export PATH=$PATH:$BPATH
-export PATH=$PATH:$HPATH
+export PATH=$BPATH:$PATH
+export PATH=$HPATH:$PATH
 
 if [ $BITMODE == "full" ] ; then
 	##########################################################

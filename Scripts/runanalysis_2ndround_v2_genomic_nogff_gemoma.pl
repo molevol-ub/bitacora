@@ -153,7 +153,13 @@ foreach my $chem (@chemosensory){
 	}
 	close Gemvfile;
 
-	system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
+
+	if ($gemomaversion >= 170){
+		system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 tag=prediction pa=false > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	} elsif ($gemomaversion < 170){
+		system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	}
+
 
 	# Check if GeMoMa finished without errors
 	my $gemoerr = "0";
@@ -174,8 +180,14 @@ foreach my $chem (@chemosensory){
 
 	## Filtering annotations
 
-	system ("java -jar $gemomap CLI GAF g=$chem\/gemoma_outdir/predicted_annotation.gff outdir=$chem/gemoma_outdir f= > $chem\/gemoma.out 2> $chem\/gemoma.err");
-	
+
+	if ($gemomaversion >= 170){
+		system ("java -jar $gemomap CLI GAF g=$chem\/gemoma_outdir/predicted_annotation.gff outdir=$chem/gemoma_outdir t=prediction f= > $chem\/gemoma.out 2> $chem\/gemoma.err");	
+	} elsif ($gemomaversion < 170){
+		system ("java -jar $gemomap CLI GAF g=$chem\/gemoma_outdir/predicted_annotation.gff outdir=$chem/gemoma_outdir f= > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	}
+
+
 	# Check if GeMoMa finished without errors
 	$gemoerr = "0";
 	open (FileGemo, "<", "$chem\/gemoma.err");
@@ -196,11 +208,16 @@ foreach my $chem (@chemosensory){
 
 	# AnnotationFinalizer, the parameters differ between versions
 
-	if ($gemomaversion > 163){
+
+	if ($gemomaversion >= 170){
+		system ("java -jar $gemomap CLI AnnotationFinalizer g=$genome a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO t=prediction > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	} elsif ($gemomaversion > 163 && $gemomaversion < 170){
 		system ("java -jar $gemomap CLI AnnotationFinalizer g=$genome a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");
 	} else {
 		system ("java -jar $gemomap CLI AnnotationFinalizer a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");	
 	}
+	
+
 	
 	# Check if GeMoMa finished without errors
 	$gemoerr = "0";

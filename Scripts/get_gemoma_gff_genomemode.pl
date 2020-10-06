@@ -35,9 +35,9 @@ while (<GFFfile>) {
 		else {die "ERROR in get_gemoma_gff_genomemode.pl: It fails detecting Parent ID in $line\n";}
 
 
-		if ($genename =~ /(\S+)\_\d+dom/){
-			$genename = $1;
-		} 
+#		if ($genename =~ /(\S+)\_\d+dom/){
+#			$genename = $1;
+#		} 
 
 		if ($subline[4] > $subline[3]){ # Control to be sure that positions are ordered
 			push ( @{$gffcds{$genename}{$subline[3]}}, $line);
@@ -58,9 +58,9 @@ while (<GFFfile>) {
 		}
 		else {print "ERROR in get_gemoma_gff.pl: It fails detecting ID in $line\n";}
 
-		if ($genename =~ /(\S+)\_\d+dom/){
-			$genename = $1;
-		} 
+#		if ($genename =~ /(\S+)\_\d+dom/){
+#			$genename = $1;
+#		} 
 
 		if (exists $gffgene{$genename}){ # Control for duplicated genes in GFF3
 			die "ERROR in get_gemoma_gff_genomemode.pl: Gene $genename is duplicated in the GFF3, found duplicate in $line\nPlease, take a look into your GFF3 and delete duplicated genes\n";

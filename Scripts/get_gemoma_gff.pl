@@ -31,14 +31,14 @@ while (<GFFfile>) {
 		my $genename = "";
 		if ($subline[8] =~ /Parent=([^;]+)/){
 		#if ($subline[8] =~ /transcript_id \"(\S+)\"/){
-			$genename = $1;
+			$genename = uc($1); ### uc added to avoid gemoma upper case or not in different versions
 		}
 		else {die "ERROR in get_gemoma_gff.pl: It fails detecting Parent ID in $line\n";}
 
 
-		if ($genename =~ /(\S+)\_\d+dom/){
-			$genename = $1;
-		} 
+#		if ($genename =~ /(\S+)\_\d+DOM/){ ## DOM in upper case instead of dom (because of line 34)
+#			$genename = $1;
+#		} 
 
 		if ($subline[4] > $subline[3]){ # Control to be sure that positions are ordered
 			push ( @{$gffcds{$genename}{$subline[3]}}, $line);
@@ -55,13 +55,13 @@ while (<GFFfile>) {
 		my $genename = "";
 		if ($subline[8] =~ /ID=([^;]+)/){
 		#if ($subline[8] =~ /transcript_id \"(\S+)\"/){
-			$genename = $1;
+			$genename = uc($1);  ### uc added to avoid gemoma upper case or not in different versions
 		}
 		else {print "ERROR in get_gemoma_gff.pl: It fails detecting ID in $line\n";}
 
-		if ($genename =~ /(\S+)\_\d+dom/){
-			$genename = $1;
-		} 
+#		if ($genename =~ /(\S+)\_\d+DOM/){ ## DOM in upper case instead of dom (because of line 34)
+#			$genename = $1;
+#		} 
 
 		if (exists $gffgene{$genename}){ # Control for duplicated genes in GFF3
 			die "ERROR in get_gemoma_gff.pl: Gene $genename is duplicated in the GFF3, found duplicate in $line\nPlease, take a look into your GFF3 and delete duplicated genes\n";
@@ -94,7 +94,7 @@ while (<File>) {
 	next if ($line =~ /^#/);
 	my @subl = split (/\t/, $line);
 
-	my $gene = "$subl[3]";
+	my $gene = uc($subl[3]); ### uc added to avoid gemoma upper case or not in different versions
 	my $geneparent = "gene_$gene";
 
 	$genecount++;
