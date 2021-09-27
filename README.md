@@ -69,7 +69,7 @@ $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
 ```
 
-- GeMoMa: By default, BITACORA reconstructs new gene models using the GeMoMa algorithm (Keilwagen et al., 2016; 2018). The GeMoMa jar file (i.e. GeMoMa-1.6.4.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa. The latest version of GeMoMa tested in our pipeline is v1.6.4.
+- GeMoMa: By default, BITACORA reconstructs new gene models using the GeMoMa algorithm (Keilwagen et al., 2016; 2018). The GeMoMa jar file (i.e. GeMoMa-1.6.4.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa. The latest version of GeMoMa tested in our pipeline is v1.7.1.
 ```
 GEMOMAP=/path/to/GeMoMa.jar  (within runBITACORA.sh script)
 ```
