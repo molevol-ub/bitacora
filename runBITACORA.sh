@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.3
+VERSION=1.4
 
 ##########################################################
 ##              EXPORT EXECUTABLES TO PATH              ##
@@ -83,6 +83,10 @@ GENOMICBLASTP=F
 # If ADDFILTER=T, BITACORA will cluster highly similar sequences (with 98% identity; being isoforms or resulting from putative assembly artifacts), and will discard all annotations with a length lower than the specified in FILTERLENGTH parameter.
 ADDFILTER=T
 FILTERLENGTH=30
+
+# Alternatively, BITACORA can report all annotated genes, without any clustering of identical copies. Set RETAINNONFILTER=T in this case. 
+RETAINNONFILTER=F
+
 
 ##########################################################
 ##                      HOW TO RUN                      ##
@@ -194,9 +198,16 @@ fi
 
 # Cleaning 
 
-if [ $CLEAN = "T" ]; then
+if [ $RETAINNONFILTER == "T" ]; then
+	perl $SCRIPTDIR/runcleaning_allcopies.pl $NAME $QUERYDIR
+	echo -e "Cleaning output folders\n";
+fi
+
+if [ $RETAINNONFILTER != "T" ]; then
+	if [ $CLEAN == "T" ]; then
 	perl $SCRIPTDIR/runcleaning.pl $NAME $QUERYDIR
 	echo -e "Cleaning output folders\n";
+	fi
 fi
 
 

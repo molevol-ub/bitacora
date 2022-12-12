@@ -52,7 +52,7 @@ while(<File>){
 	chomp;
 	my $line = $_;
 	next if ($line !~ /\S+/);
-	if ($line =~ /$genome\.nin/ || $line =~ /$genome\.nhr/ || $line =~ /$genome\.nsq/){
+	if ($line =~ /$genome\.nin/ || $line =~ /$genome\.nhr/ || $line =~ /$genome\.nsq/ || $line =~ /$genome\.\d+\.nsq/){
 		$indexed++;
 	}
 	elsif ($line =~ /$genome\.frame\d/){
@@ -71,7 +71,7 @@ if ($translated == 6){
 	print "Translation completed for $genome\n";
 }
 
-if ($indexed == 3){
+if ($indexed > 1){ # Changed from > 3, for big genomes there are multiple files
 	print "Found a blast index for $genome\n";
 } else {
 	system ("makeblastdb -dbtype nucl -in $genome");
@@ -154,7 +154,9 @@ foreach my $chem (@chemosensory){
 	close Gemvfile;
 
 
-	if ($gemomaversion >= 170){
+	if ($gemomaversion >= 190){
+		system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir o=STATIC p=10000 ct=0.2 tag=prediction pa=false > $chem\/gemoma.out 2> $chem\/gemoma.err");
+	} elsif  ($gemomaversion >= 170){
 		system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 tag=prediction pa=false > $chem\/gemoma.out 2> $chem\/gemoma.err");
 	} elsif ($gemomaversion < 170){
 		system ("java -jar $gemomap CLI GeMoMa s=$chem\/$name\_Vs$chem\_tblastn\.outfmt6_filtered.txt t=$genome c=$chem\/$chem\_db_filt.fasta outdir=$chem/gemoma_outdir p=10000 ct=0.2 > $chem\/gemoma.out 2> $chem\/gemoma.err");
@@ -208,8 +210,9 @@ foreach my $chem (@chemosensory){
 
 	# AnnotationFinalizer, the parameters differ between versions
 
-
-	if ($gemomaversion >= 170){
+	if ($gemomaversion >= 190){
+		system ("java -jar $gemomap CLI AnnotationFinalizer g=$genome a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO t=prediction tf=false > $chem\/gemoma.out 2> $chem\/gemoma.err"); # added tf (transfer features) but default is false so all keeps the same
+	} elsif ($gemomaversion >= 170){
 		system ("java -jar $gemomap CLI AnnotationFinalizer g=$genome a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO t=prediction > $chem\/gemoma.out 2> $chem\/gemoma.err");
 	} elsif ($gemomaversion > 163 && $gemomaversion < 170){
 		system ("java -jar $gemomap CLI AnnotationFinalizer g=$genome a=$chem/gemoma_outdir/filtered_predictions.gff outdir=$chem/gemoma_outdir rename=NO > $chem\/gemoma.out 2> $chem\/gemoma.err");
@@ -333,6 +336,7 @@ foreach my $chem (@chemosensory){
 
 	## Generating a GFF for genomic genes
 
+	system ("cp $chem/$chem\_genomic_genes.gff3 $chem/$chem\_genomic_genes_unfiltered.gff3"); # Just to save the unfiltered gff
 	system ("perl $dirname/get_annot_genomic_genes_gff_v2.pl $chem/$chem\_genomic_genes.gff3 $genome $chem/$chem\_genomic_geneshmmer_parsed_list.txt $chem/$chem");
 
 

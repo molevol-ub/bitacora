@@ -11,13 +11,18 @@ BITACORA documentation can be also be found in: http://www.ub.edu/softevol/bitac
 
 ### Version history
 
+BITACORA 1.4:
+- BITACORA can now handle the latest GeMoMa versions v1.8 and v1.9. Note that these newer versions have changed the heuristic for identifying multiple transcripts predictions, which improves the number of annotations, but I noticed that it also reports some very fragmented annotations that require additional filtering and validation. Therefore, consider using “-r T” and “-l” adjusted to the minimum expected length of the gene family if using the latest GeMoMa version 1.9.
+- Added new parameter "-z" that allows to retain all gene annotations without clustering identical copies. Current genome assemblies are mostly based in long-read sequencing which allows to assemble large genomic regions containing gene family tandem duplications, and finding highly identical genes in those regions is interesting to explore gene family evolution. Therefore, this option allows BITACORA to report all annotated genes, including identical copies. In addition, a new script is added in Tools “identify_similar_sequence_clusters.pl” that allows to identify highly identical clusters of genes. Note that it will also report partial genes.  
+- Minor bug fixes and code optimization. 
+
 BITACORA 1.3:
 - BITACORA is able to use the latest GeMoMa version v1.7.1. However, v1.7.0 contains a bug that prevents our pipeline from working, please use v1.7.1 instead.
-- Added a new script to call BITACORA with command line options (run first '$ chmod +x runBITACORA_command_line.sh' to make it executable, and '$ ./runBITACORA_command_line.sh -h' to see the available options)
+- Added a new script to call BITACORA with command line options (run first '$ chmod +x runBITACORA_command_line.sh' to make it executable, and '$ ./runBITACORA_command_line.sh -h' to see the available options).
 
 BITACORA 1.2.1:
 - Implementation of GeMoMa algorithm to reconstruct new gene models (set as default). The latest version tested in our pipeline is GeMoMa v1.6.4.
-- New parameter that allows retaining novel proteins based on HMMER or BLASTP positive hits
+- New parameter that allows retaining novel proteins based on HMMER or BLASTP positive hits.
 - Additional step to conduct a more strict filtering of the output annotations in order to obtain a confident estimation on the number of gene members for a specific gene family.
 
 
@@ -69,7 +74,7 @@ $ export PATH=$PATH:/path/to/blast/bin
 $ export PATH=$PATH:/path/to/hmmer/bin
 ```
 
-- GeMoMa: By default, BITACORA reconstructs new gene models using the GeMoMa algorithm (Keilwagen et al., 2016; 2018). The GeMoMa jar file (i.e. GeMoMa-1.6.4.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa. The latest version of GeMoMa tested in our pipeline is v1.7.1.
+- GeMoMa: By default, BITACORA reconstructs new gene models using the GeMoMa algorithm (Keilwagen et al., 2016; 2018). The GeMoMa jar file (i.e. GeMoMa-1.6.4.jar) must be specified in GEMOMAP variable in runBITACORA.sh. GeMoMa is implemented in Java using Jstacs and can be downloaded from: http://www.jstacs.de/index.php/GeMoMa. The latest version of GeMoMa tested in our pipeline is v1.9.
 ```
 GEMOMAP=/path/to/GeMoMa.jar  (within runBITACORA.sh script)
 ```

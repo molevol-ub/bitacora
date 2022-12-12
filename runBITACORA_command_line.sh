@@ -13,7 +13,7 @@
 ##                                                      ##
 ##########################################################
 
-VERSION=1.3
+VERSION=1.4
 
 # Default values for editable parameters
 CLEAN=T
@@ -24,6 +24,7 @@ MAXINTRON=15000
 GENOMICBLASTP=F
 ADDFILTER=T
 FILTERLENGTH=30
+RETAINNONFILTER=F
 
 BITMODE=full
 NAME=Out
@@ -55,7 +56,8 @@ function usage {
 	echo "      -i Maximum intron length to join putative exons in the close-proximity algorithm (Default=$MAXINTRON)"
 	echo "      -b Specify '-b T' to conduct an additional BLASTP search in addition to HMMER to validate novel genes (Default=$GENOMICBLASTP)"	
 	echo "      -r Conduct an additional filtering of the annotations if -r T. Specify 'T' or 'F' (Default=$ADDFILTER)"		
-	echo "      -l Minimum length to retain identified genes (Default=$FILTERLENGTH)"											
+	echo "      -l Minimum length to retain identified genes (Default=$FILTERLENGTH , requires -r T)"											
+	echo "      -z Retain all annotated genes, without any clustering of identical copies. Specify 'T' or 'F' (Default=$RETAINNONFILTER), if set to T it will ignore -r and -l"											
 	echo "      -h Show this help. See BITACORA documentation for further details about each parameter"
 	echo ""
 	echo "  Example for running BITACORA full mode using GeMoMa algorithm and 4 threads:"
@@ -136,7 +138,10 @@ while [ $# -gt 0 ]; do
 			;;	
 		-l)	shift
 			FILTERLENGTH=$1
-			;;							
+			;;	
+		-z)	shift
+			RETAINNONFILTER=$1
+			;;									
 		*)	echo 
 			echo "ERROR - Invalid option: $1"
 			echo
@@ -264,9 +269,16 @@ if [ $BITMODE == "full" ] ; then
 
 	# Cleaning 
 
-	if [ $CLEAN = "T" ]; then
+	if [ $RETAINNONFILTER == "T" ]; then
+		perl $SCRIPTDIR/runcleaning_allcopies.pl $NAME $QUERYDIR
+		echo -e "Cleaning output folders\n";
+	fi
+
+	if [ $RETAINNONFILTER != "T" ]; then
+		if [ $CLEAN == "T" ]; then
 		perl $SCRIPTDIR/runcleaning.pl $NAME $QUERYDIR
 		echo -e "Cleaning output folders\n";
+		fi
 	fi
 
 
@@ -368,9 +380,16 @@ elif [ $BITMODE == "genome" ] ; then
 
 	# Cleaning 
 
-	if [ $CLEAN = "T" ]; then
+	if [ $RETAINNONFILTER == "T" ]; then
+		perl $SCRIPTDIR/runcleaning_genome_mode_allcopies.pl $NAME $QUERYDIR
+		echo -e "Cleaning output folders\n";
+	fi
+
+	if [ $RETAINNONFILTER != "T" ]; then
+		if [ $CLEAN == "T" ]; then
 		perl $SCRIPTDIR/runcleaning_genome_mode.pl $NAME $QUERYDIR
 		echo -e "Cleaning output folders\n";
+		fi
 	fi
 
 

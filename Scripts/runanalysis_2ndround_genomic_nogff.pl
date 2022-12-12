@@ -51,7 +51,7 @@ while(<File>){
 	chomp;
 	my $line = $_;
 	next if ($line !~ /\S+/);
-	if ($line =~ /$genome\.nin/ || $line =~ /$genome\.nhr/ || $line =~ /$genome\.nsq/){
+	if ($line =~ /$genome\.nin/ || $line =~ /$genome\.nhr/ || $line =~ /$genome\.nsq/ || $line =~ /$genome\.\d+\.nsq/){
 		$indexed++;
 	}
 	elsif ($line =~ /$genome\.frame\d/){
@@ -70,7 +70,7 @@ if ($translated == 6){
 	print "Translation completed for $genome\n";
 }
 
-if ($indexed == 3){
+if ($indexed > 1){ # Changed from > 3, for big genomes there are multiple files
 	print "Found a blast index for $genome\n";
 } else {
 	system ("makeblastdb -dbtype nucl -in $genome");

@@ -106,12 +106,13 @@ close Fasta;
 
 foreach my $key (sort keys %nrfa){
 	my $nkey = $key;
-	#$nkey =~ s/\_//g;
+	$nkey =~ s/\_//g;
 	#$nkey =~ s/\.//g;
 	#$nkey =~ s/\-//g;
-	#$nkey =~ s/\,//g;
-	#$nkey =~ s/\;//g;
-	#$nkey =~ s/\://g;
+	$nkey =~ s/\,//g;
+	$nkey =~ s/\;//g;
+	$nkey =~ s/\://g;
+	$nkey =~ s/\|//g;
 	print Results ">$nkey\n$fasta{$key}\n";
 }
 
