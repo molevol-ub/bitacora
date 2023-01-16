@@ -92,7 +92,7 @@ while (<File>) {
 	$line = $_;
 	next if ($line !~ /\S+/);
 	next if ($line =~ /^#/);
-	next if ($line =~ /\#transcripts/); # Header
+	next if ($line =~ /\#transcripts/ || $line =~ /\#CDSs/); # Header
 	my @subl = split (/\t/, $line);
 
 	my $gene = uc($subl[5]); ### uc added to avoid gemoma upper case or not in different versions
