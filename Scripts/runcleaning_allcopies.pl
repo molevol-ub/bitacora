@@ -41,10 +41,16 @@ foreach my $chem (@chemosensory){
 	system("mv $chem\/Intermediate_files/*bed $chem\/");
 #	system("mv $chem\/Intermediate_files/*genomic_and_annotated* $chem\/");
 
-	system ("cat $chem\/Intermediate_files/*_genomic_genes_hmmerparsed_proteins.fasta $chem\/Intermediate_files/*_proteins.fasta > $chem\/$chem\_genomic_and_annotated_proteins_all.fasta 2>/dev/null");
-	system ("cat $chem\/Intermediate_files/*_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/Intermediate_files/*_proteins_trimmed.fasta > $chem\/$chem\_genomic_and_annotated_proteins_trimmed_all.fasta 2>/dev/null");
-	system ("cat $chem\/Intermediate_files/*_genomic_genes.gff3 $chem\/Intermediate_files/*_annot_genes.gff3 > $chem\/$chem\_genomic_and_annotated_genes_all.gff3 2>/dev/null");
-	system ("cat $chem\/Intermediate_files/*_genomic_genes_trimmed.gff3 $chem\/Intermediate_files/*_annot_genes_trimmed.gff3 > $chem\/$chem\_genomic_and_annotated_genes_trimmed_all.gff3 2>/dev/null");
+	# Using the asterisk combines redundant copies
+	#system ("cat $chem\/Intermediate_files/*_genomic_genes_hmmerparsed_proteins.fasta $chem\/Intermediate_files/*_proteins.fasta > $chem\/$chem\_genomic_and_annotated_proteins_all.fasta 2>/dev/null");
+	#system ("cat $chem\/Intermediate_files/*_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/Intermediate_files/*_proteins_trimmed.fasta > $chem\/$chem\_genomic_and_annotated_proteins_trimmed_all.fasta 2>/dev/null");
+	#system ("cat $chem\/Intermediate_files/*_genomic_genes.gff3 $chem\/Intermediate_files/*_annot_genes.gff3 > $chem\/$chem\_genomic_and_annotated_genes_all.gff3 2>/dev/null");
+	#system ("cat $chem\/Intermediate_files/*_genomic_genes_trimmed.gff3 $chem\/Intermediate_files/*_annot_genes_trimmed.gff3 > $chem\/$chem\_genomic_and_annotated_genes_trimmed_all.gff3 2>/dev/null");
+	# Updated code
+	system ("cat $chem\/Intermediate_files/$chem\_genomic_genes_hmmerparsed_proteins.fasta $chem\/Intermediate_files/$chem\_proteins.fasta > $chem\/$chem\_genomic_and_annotated_proteins_all.fasta 2>/dev/null");
+	system ("cat $chem\/Intermediate_files/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta $chem\/Intermediate_files/$chem\_proteins_trimmed.fasta > $chem\/$chem\_genomic_and_annotated_proteins_trimmed_all.fasta 2>/dev/null");
+	system ("cat $chem\/Intermediate_files/$chem\_genomic_genes.gff3 $chem\/Intermediate_files/$chem\_annot_genes.gff3 > $chem\/$chem\_genomic_and_annotated_genes_all.gff3 2>/dev/null");
+	system ("cat $chem\/Intermediate_files/$chem\_genomic_genes_trimmed.gff3 $chem\/Intermediate_files/$chem\_annot_genes_trimmed.gff3 > $chem\/$chem\_genomic_and_annotated_genes_trimmed_all.gff3 2>/dev/null");
 
 	system ("rm -rf $chem\/*_renamed\.fasta $chem\/*\.fasta\.* 2>/dev/null");
 
