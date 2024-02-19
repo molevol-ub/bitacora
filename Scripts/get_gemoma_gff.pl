@@ -64,7 +64,7 @@ while (<GFFfile>) {
 #		} 
 
 		if (exists $gffgene{$genename}){ # Control for duplicated genes in GFF3
-			die "ERROR in get_gemoma_gff.pl: Gene $genename is duplicated in the GFF3, found duplicate in $line\nPlease, take a look into your GFF3 and delete duplicated genes\n";
+#			die "ERROR in get_gemoma_gff.pl: Gene $genename is duplicated in the GFF3, found duplicate in $line\nPlease, take a look into your GFF3 and delete duplicated genes\n";
 		}
 
 		if ($subline[4] > $subline[3]){ # Control to be sure that positions are ordered
