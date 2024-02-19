@@ -16,6 +16,7 @@ my $genome = $ARGV[4];
 
 my $novelgenes = "";
 
+my $prevgenename = "";
 
 # Reading GFF
 my %gffcds; my %gffgene;
@@ -35,6 +36,7 @@ while (<GFFfile>) {
 		}
 		else {die "ERROR in get_gemomav18_gff.pl: It fails detecting Parent ID in $line\n";}
 
+		$genename = $prevgenename; # New line to control duplicated genes
 
 #		if ($genename =~ /(\S+)\_\d+DOM/){ ## DOM in upper case instead of dom (because of line 34)
 #			$genename = $1;
@@ -64,7 +66,10 @@ while (<GFFfile>) {
 #		} 
 
 		if (exists $gffgene{$genename}){ # Control for duplicated genes in GFF3
-			die "ERROR in get_gemomav18_gff.pl: Gene $genename is duplicated in the GFF3, found duplicate in $line\nPlease, take a look into your GFF3 and delete duplicated genes\n";
+			#die "ERROR in get_gemomav18_gff.pl: Gene $genename is duplicated in the GFF3, found duplicate in $line\nPlease, take a look into your GFF3 and delete duplicated genes\n";
+			# Some cases are badly named in gemoma, rename here the gene
+			my $ngenename = "$genename"."d1";
+			$genename = $ngenename;
 		}
 
 		if ($subline[4] > $subline[3]){ # Control to be sure that positions are ordered
@@ -73,6 +78,8 @@ while (<GFFfile>) {
 		 else {
 		 	$gffgene{$genename} = join ("\t", $subline[0],$subline[1],$subline[2],$subline[4],$subline[3],$subline[5],$subline[6],$subline[7],$subline[8]);
 		}
+
+		$prevgenename = $genename;
 
 	}
 }
@@ -146,7 +153,7 @@ while (<File>) {
 			}
 		}
 
-	} else {die "ERROR in get_gemomav18_gff.pl: It fails finding the gene in GFF $gene\n";}
+	} else {die "ERROR in get_gemomav18_gff.pl: It fails finding the gene in GFF $gene in \n$line\n";}
 
 
 	if ($subl[9] =~ /NA/){
