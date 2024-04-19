@@ -351,6 +351,9 @@ foreach my $chem (@chemosensory){
 		system ("perl $dirname/get_gemoma_gff.pl $chem\/gemoma_outdir/filtered_predictions.gff $chem\/gemoma_outdir/comparison.tabular $chem\/gemoma_outdir/$chem $chem $genome");		
 	}
 
+	# Note, GeMoMa 1.9 Analyzer performs worst than the previous CompareTranscripts and it misses some genes that were previously annotated if the new genes span exons from two genes for example
+	# Addressed in line 376 modifying the blast Vs existing annotations
+
 	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes_novel.gff3 $chem/$chem\_genomic_genes.gff3");
 	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes_novel.pep.fasta $chem/$chem\_genomic_genes_proteins.fasta");
 
@@ -368,7 +371,15 @@ foreach my $chem (@chemosensory){
 	# Removing putative new sequences already annotated (i.e. duplicated regions due to assembly artifacts)
 
 	#print "Doing $chem blast genomic vs anotated $chem\n";
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+#	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+	# Using local alignments, the new gemoma version Analyzer misses some genes already annotated, so it is avoided here using a local alignment
+	if ($gemomaversion >= 180){
+		system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated_global.outfmt6");
+		system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 2 -outfmt 6 -out $chem/$chem\_genomicVsanotated_local.outfmt6 -ungapped -comp_based_stats F");
+		system ("cat $chem/$chem\_genomicVsanotated_global.outfmt6 $chem/$chem\_genomicVsanotated_local.outfmt6 > $chem/$chem\_genomicVsanotated.outfmt6");
+	} else {
+		system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+	}
 
 	open (File, "<", "$chem/$chem\_proteins\_trimmed.fasta");
 	my %fasta_annot;

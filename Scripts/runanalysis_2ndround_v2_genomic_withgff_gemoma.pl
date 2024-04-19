@@ -390,7 +390,15 @@ foreach my $chem (@chemosensory){
 	# Removing putative new sequences already annotated (i.e. duplicated regions due to assembly artifacts)
 
 	#print "Doing $chem blast genomic vs anotated $chem\n";
-	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+#	system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+	# Using local alignments, the new gemoma version Analyzer misses some genes already annotated, so it is avoided here using a local alignment
+	if ($gemomaversion >= 180){
+		system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated_global.outfmt6");
+		system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 2 -outfmt 6 -out $chem/$chem\_genomicVsanotated_local.outfmt6 -ungapped -comp_based_stats F");
+		system ("cat $chem/$chem\_genomicVsanotated_global.outfmt6 $chem/$chem\_genomicVsanotated_local.outfmt6 > $chem/$chem\_genomicVsanotated.outfmt6");
+	} else {
+		system ("blastp -query $chem/$chem\_genomic_genes_hmmerparsed_proteins_trimmed.fasta -subject $chem/$chem\_proteins\_trimmed.fasta -evalue 1e-5 -max_target_seqs 1 -outfmt 6 -out $chem/$chem\_genomicVsanotated.outfmt6");
+	}
 
 	open (File, "<", "$chem/$chem\_proteins\_trimmed.fasta");
 	my %fasta_annot;
