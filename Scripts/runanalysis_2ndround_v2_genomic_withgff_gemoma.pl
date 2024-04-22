@@ -349,8 +349,15 @@ foreach my $chem (@chemosensory){
 		system ("perl $dirname/get_gemoma_gff.pl $chem\/gemoma_outdir/filtered_predictions.gff $chem\/gemoma_outdir/comparison.tabular $chem\/gemoma_outdir/$chem $chem $genome");		
 	}
 
-	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes_novel.gff3 $chem/$chem\_genomic_genes_unfiltered.gff3");
-	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes_novel.pep.fasta $chem/$chem\_genomic_genes_proteins.fasta");
+
+	# Note, GeMoMa 1.9 Analyzer performs worst than the previous CompareTranscripts and it misses some genes that were previously annotated if the new genes span exons from two genes for example
+	# Filtering here, and also added modifying the blast Vs existing annotations
+
+	system ("perl $dirname/FindOverlapAtCDSlevel.pl $chem\/gemoma_outdir/$chem\_gemoma_genes_novel.gff3 $chem\/$chem\_annot_genes.gff3 > $chem\/gemoma_outdir/$chem\_overlap_CDS_novelgenes.txt");
+	system ("perl $dirname/get_gemoma_gff_filternovel_v2.pl $chem\/gemoma_outdir/$chem\_gemoma_genes_novel.gff3 $chem\/gemoma_outdir/$chem\_overlap_CDS_novelgenes.txt $chem\/gemoma_outdir/$chem $chem $genome");
+
+	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes_novel_v2.gff3 $chem/$chem\_genomic_genes.gff3");
+	system ("cp $chem\/gemoma_outdir/$chem\_gemoma_genes_novel_v2.pep.fasta $chem/$chem\_genomic_genes_proteins.fasta");
 
 
 	# Filtering putative erroneus proteins (blastp and hmmer)
