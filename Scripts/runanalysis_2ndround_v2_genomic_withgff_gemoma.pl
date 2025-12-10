@@ -386,6 +386,7 @@ foreach my $chem (@chemosensory){
 
 	# Generating a GFF3 for the identified and reannotated (trimmed) proteins
 
+	system ("cp $chem/$chem\_genomic_genes.gff3 $chem/$chem\_genomic_genes_unfiltered.gff3"); # Just to save the unfiltered gff
 	system ("perl $dirname/get_annot_genomic_genes_gff_v2.pl $chem/$chem\_genomic_genes_unfiltered.gff3 $genome $chem/$chem\_genomic_genes\_combinedsearches_list.txt $chem/$chem");
 
 	# Validating the obtained GFF3
